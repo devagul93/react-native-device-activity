@@ -80,6 +80,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A965D3F02CE02FE400BC6C7C /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				A965D3EB2CE02FE400BC6C7C /* DeviceActivityReport.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -152,6 +163,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A965D3DC2CE02FE400BC6C7C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A965D3F12CE0321000BC6C7C /* DeviceActivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +379,7 @@
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
 				3DB52EB52D2348B6B33DCF43 /* Embed Foundation Extensions */,
 				DC6C57584D7EC65201A20BD6 /* [CP] Embed Pods Frameworks */,
+				A965D3F02CE02FE400BC6C7C /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
@@ -367,6 +387,7 @@
 				09A35F3A3CA14FF7910A7D62 /* PBXTargetDependency */,
 				E79F7418C95C4FDF86F2AC3A /* PBXTargetDependency */,
 				8D395BFCE4984204A074EC2E /* PBXTargetDependency */,
+				A965D3EA2CE02FE400BC6C7C /* PBXTargetDependency */,
 			);
 			name = reactnativedeviceactivityexample;
 			productName = reactnativedeviceactivityexample;
@@ -648,6 +669,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9A0307C2CFF148E00D9E7E8 /* Shared.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A965D3DB2CE02FE400BC6C7C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1281,6 +1309,15 @@
 			buildConfigurations = (
 				XXD1169F79EA1BE6030601XX /* Debug */,
 				XX2B9E060A37CDC639FD37XX /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A965D3ED2CE02FE400BC6C7C /* Build configuration list for PBXNativeTarget "DeviceActivityReport" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A965D3EE2CE02FE400BC6C7C /* Debug */,
+				A965D3EF2CE02FE400BC6C7C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
