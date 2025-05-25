@@ -5,7 +5,7 @@ import SwiftUI
 import UIKit
 
 @available(iOS 15.0, *)
-class ReactNativeDeviceActivityView: ExpoView {
+class ReactNativeDeviceActivityViewPersisted: ExpoView {
 
   let model = ScreenTimeSelectAppsModel()
 
@@ -50,19 +50,36 @@ class ReactNativeDeviceActivityView: ExpoView {
   var previousSelection: FamilyActivitySelection?
 
   func updateSelection(selection: FamilyActivitySelection) {
-    let isSelectionEmpty =
-      selection.applicationTokens.isEmpty && selection.categoryTokens.isEmpty
-      && selection.webDomainTokens.isEmpty
+    if let activitySelectionId = model.activitySelectionId {
+      let isSelectionNonEmpty =
+        selection.applicationTokens.count > 0 || selection.webDomainTokens.count > 0
+        || selection.categoryTokens
+          .count > 0
 
-    let familyActivitySelectionString = serializeFamilyActivitySelection(
-      selection: selection
-    )
+      if isSelectionNonEmpty {
+        setFamilyActivitySelectionById(
+          id: activitySelectionId,
+          activitySelection: selection
+        )
+      } else {
+        // remove to allow for reinitializing the selection, with whatever the includeEntireCategory setting is
+        removeFamilyActivitySelectionById(id: activitySelectionId)
+      }
 
-    onSelectionChange([
-      "familyActivitySelection": (isSelectionEmpty ? nil : familyActivitySelectionString) as Any,
-      "applicationCount": selection.applicationTokens.count,
-      "categoryCount": selection.categoryTokens.count,
-      "webDomainCount": selection.webDomainTokens.count,
-    ])
+      if #available(iOS 15.2, *) {
+        onSelectionChange([
+          "applicationCount": selection.applicationTokens.count,
+          "categoryCount": selection.categoryTokens.count,
+          "webDomainCount": selection.webDomainTokens.count,
+          "includeEntireCategory": selection.includeEntireCategory
+        ])
+      } else {
+        onSelectionChange([
+          "applicationCount": selection.applicationTokens.count,
+          "categoryCount": selection.categoryTokens.count,
+          "webDomainCount": selection.webDomainTokens.count
+        ])
+      }
+    }
   }
 }

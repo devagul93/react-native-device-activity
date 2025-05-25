@@ -1,2 +1,16 @@
-swift format -i -p -r ./packages/react-native-device-activity/ios ./packages/react-native-device-activity/targets ./apps/example/ios
-apps/example/ios/Pods/SwiftLint/swiftlint lint --fix
+#!/bin/sh
+# Format Swift code if swift format is available
+if command -v swift >/dev/null 2>&1 && swift format --help >/dev/null 2>&1; then
+  swift format -i -p -r ./packages/react-native-device-activity/ios ./packages/react-native-device-activity/targets ./apps/example/ios
+else
+  echo "Swift format not available, skipping Swift formatting"
+fi
+
+# Run SwiftLint if available
+if [ -f "apps/example/ios/Pods/SwiftLint/swiftlint" ]; then
+  apps/example/ios/Pods/SwiftLint/swiftlint lint --fix
+elif command -v swiftlint >/dev/null 2>&1; then
+  swiftlint lint --fix
+else
+  echo "SwiftLint not found, skipping Swift linting"
+fi
