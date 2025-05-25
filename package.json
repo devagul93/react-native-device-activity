@@ -3,10 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "description": "Root for the react-native-device-activity fork, directing to the actual package.",
-  "scripts": {
-    "build": "echo 'Build script in root started' > root_build_started.log && cd packages/react-native-device-activity && echo 'Inside packages/react-native-device-activity' > sub_package_reached.log && npm install && npm run build",
-    "prepare": "npm run build"
-  },
+  "scripts": {},
   "main": "packages/react-native-device-activity/build/index.js",
   "types": "packages/react-native-device-activity/build/index.d.ts",
   "files": [
