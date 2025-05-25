@@ -1,38 +1,22 @@
 {
-  "name": "react-native-device-activity-mono",
-  "version": "1.0.1",
+  "name": "react-native-device-activity-monorepo-root",
   "private": true,
-  "description": "Provides access to Apples DeviceActivity API",
+  "version": "0.0.1",
+  "description": "Root for the react-native-device-activity fork, directing to the actual package.",
   "scripts": {
-    "lint": "eslint .",
-    "pre-push": "bun run typecheck && bun run lint && apps/example/ios/Pods/SwiftLint/swiftlint lint --strict",
-    "typecheck": "cd packages/react-native-device-activity && bun run typecheck && cd ../../apps/example && bun run typecheck",
-    "prepare": "husky",
-    "nail-workspace-dependency-versions": "bun run scripts/nail-workspace-dependency-versions.ts"
+    "build": "cd packages/react-native-device-activity && npm install && npm run build",
+    "prepare": "npm run build"
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
+  "main": "packages/react-native-device-activity/build/index.js",
+  "types": "packages/react-native-device-activity/build/index.d.ts",
+  "files": [
+    "packages/react-native-device-activity/build",
+    "packages/react-native-device-activity/ios",
+    "packages/react-native-device-activity/app.plugin.js",
+    "packages/react-native-device-activity/config-plugin",
+    "packages/react-native-device-activity/expo-module.config.json",
+    "packages/react-native-device-activity/package.json",
+    "packages/react-native-device-activity/README.md"
   ],
-  "keywords": [
-    "react-native",
-    "expo",
-    "react-native-device-activity",
-    "device-activity",
-    "screen-time"
-  ],
-  "repository": {
-    "url": "git+https://github.com/kingstinct/react-native-device-activity.git"
-  },
-  "bugs": {
-    "url": "https://github.com/kingstinct/react-native-device-activity/issues"
-  },
-  "author": "Robert Herber <robert@kingstinct.com> (https://github.com/robertherber)",
-  "license": "MIT",
-  "homepage": "https://github.com/kingstinct/react-native-device-activity#readme",
-  "devDependencies": {
-    "eslint": "8",
-    "husky": "^9.1.7",
-    "prettier": "^3.3.3"
-  }
+  "devDependencies": {}
 }
