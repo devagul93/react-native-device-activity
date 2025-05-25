@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Root for the react-native-device-activity fork, directing to the actual package.",
   "scripts": {
-    "build": "cd packages/react-native-device-activity && npm install && npm run build",
+    "build": "cd packages/react-native-device-activity && npm install > npm_install.log 2>&1 && npm run build > npm_build.log 2>&1",
     "prepare": "npm run build"
   },
   "main": "packages/react-native-device-activity/build/index.js",
