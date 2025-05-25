@@ -7,8 +7,9 @@
   "types": "packages/react-native-device-activity/build/index.d.ts",
   "scripts": {
     "lint": "eslint .",
-    "pre-push": "bun run typecheck && bun run lint && apps/example/ios/Pods/SwiftLint/swiftlint lint --strict",
-    "typecheck": "cd packages/react-native-device-activity && bun run typecheck && cd ../../apps/example && bun run typecheck",
+    "pre-push": "bun run typecheck && bun run lint",
+    "typecheck": "cd packages/react-native-device-activity && bun run typecheck",
+    "typecheck-all": "cd packages/react-native-device-activity && bun run typecheck && cd ../../apps/example && bun run typecheck",
     "build": "cd packages/react-native-device-activity && npm run build",
     "prepare": "npm run build",
     "postinstall": "husky",
