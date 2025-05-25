@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "expo-module test",
     "prepublishOnly": "expo-module prepublishOnly && tsc && cp ../../README.md ./README.md",
+    "prepare": "npm run build",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android"
