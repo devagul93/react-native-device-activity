@@ -877,30 +877,28 @@ public class ReactNativeDeviceActivityViewPersistedModule: Module {
 public class DeviceActivityReportViewModule: Module {
   public func definition() -> ExpoModulesCore.ModuleDefinition {
     Name("DeviceActivityReportViewModule")
-    
-    if #available(iOS 16.0, *) {
-      View(DeviceActivityReportView.self) {
-        // Defines props for the DeviceActivityReportView
-        Prop("familyActivitySelection") { (view: DeviceActivityReportView, prop: String) in
-          let selection = deserializeFamilyActivitySelection(familyActivitySelectionStr: prop)
-          view.model.familyActivitySelection = selection
-        }
 
-        Prop("context") { (view: DeviceActivityReportView, prop: String) in
-          view.model.context = prop
-        }
+    View(DeviceActivityReportView.self) {
+      // Defines props for the DeviceActivityReportView
+      Prop("familyActivitySelection") { (view: DeviceActivityReportView, prop: String) in
+        let selection = deserializeFamilyActivitySelection(familyActivitySelectionStr: prop)
+        view.model.familyActivitySelection = selection
+      }
 
-        Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in
-          view.model.segmentation = prop
-        }
+      Prop("context") { (view: DeviceActivityReportView, prop: String) in
+        view.model.context = prop
+      }
 
-        Prop("from") { (view: DeviceActivityReportView, prop: Double) in
-          view.model.from = Date(timeIntervalSince1970: prop / 1000)
-        }
+      Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in
+        view.model.segmentation = prop
+      }
 
-        Prop("to") { (view: DeviceActivityReportView, prop: Double) in
-          view.model.to = Date(timeIntervalSince1970: prop / 1000)
-        }
+      Prop("from") { (view: DeviceActivityReportView, prop: Double) in
+        view.model.from = Date(timeIntervalSince1970: prop / 1000)
+      }
+
+      Prop("to") { (view: DeviceActivityReportView, prop: Double) in
+        view.model.to = Date(timeIntervalSince1970: prop / 1000)
       }
     }
   }

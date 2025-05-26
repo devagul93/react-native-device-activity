@@ -12,22 +12,23 @@ import FamilyControls
 import Foundation
 import SwiftUI
 
-@available(iOS 16.0, *)
-class DeviceActivityReportViewModel: ObservableObject {
+// Base view model that works on iOS 15.0+
+@available(iOS 15.0, *)
+class DeviceActivityReportViewModelBase: ObservableObject {
   @Published var familyActivitySelection = FamilyActivitySelection()
-
-  @Published var devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>())
-
-  @Published var users: DeviceActivityFilter.Users? = .all
-
   @Published var context = "Total Activity"
-
   @Published var from = Date.distantPast
-
   @Published var to = Date.distantPast
-
-  // Public property for setting the string value
   @Published var segmentation: String = "daily"
+  
+  init() {}
+}
+
+// iOS 16.0+ specific view model with DeviceActivityFilter support
+@available(iOS 16.0, *)
+class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
+  @Published var devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>())
+  @Published var users: DeviceActivityFilter.Users? = .all
 
   // Computed property that converts to SegmentInterval
   var segment: DeviceActivityFilter.SegmentInterval {
@@ -42,9 +43,32 @@ class DeviceActivityReportViewModel: ObservableObject {
     }
   }
 
-  init() {}
+  override init() {
+    super.init()
+  }
 }
 
+// Fallback view for iOS 15.x
+@available(iOS 15.0, *)
+struct DeviceActivityReportFallbackUI: View {
+  @ObservedObject var model: DeviceActivityReportViewModelBase
+
+  var body: some View {
+    VStack {
+      Text("Device Activity Reports")
+        .font(.headline)
+        .padding()
+      Text("Requires iOS 16.0 or later")
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+        .padding()
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(.systemBackground))
+  }
+}
+
+// iOS 16.0+ view with actual DeviceActivityReport
 @available(iOS 16.0, *)
 struct DeviceActivityReportUI: View {
   @ObservedObject var model: DeviceActivityReportViewModel
@@ -76,29 +100,33 @@ struct DeviceActivityReportUI: View {
 
 // This view will be used as a native component. Make sure to inherit from `ExpoView`
 // to apply the proper styling (e.g. border radius and shadows).
-@available(iOS 16.0, *)
+@available(iOS 15.0, *)
 class DeviceActivityReportView: ExpoView {
 
-  public let model = DeviceActivityReportViewModel()
-
-  let contentView: UIHostingController<DeviceActivityReportUI>
+  public let model: DeviceActivityReportViewModelBase
+  private var contentView: UIHostingController<AnyView>
 
   required init(appContext: AppContext? = nil) {
-    contentView = UIHostingController(
-      rootView: DeviceActivityReportUI(
-        model: model
+    if #available(iOS 16.0, *) {
+      let viewModel = DeviceActivityReportViewModel()
+      model = viewModel
+      contentView = UIHostingController(
+        rootView: AnyView(DeviceActivityReportUI(model: viewModel))
       )
-    )
+    } else {
+      model = DeviceActivityReportViewModelBase()
+      contentView = UIHostingController(
+        rootView: AnyView(DeviceActivityReportFallbackUI(model: model))
+      )
+    }
 
     super.init(appContext: appContext)
 
     clipsToBounds = true
-
     self.addSubview(contentView.view)
   }
 
   override func layoutSubviews() {
     contentView.view.frame = bounds
   }
-
 }
