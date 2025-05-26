@@ -4,7 +4,7 @@ import * as React from "react";
 import { DeviceActivityReportViewProps } from "./ReactNativeDeviceActivity.types";
 
 const NativeView: React.ComponentType<DeviceActivityReportViewProps> =
-  requireNativeViewManager("DeviceActivityReportView");
+  requireNativeViewManager("DeviceActivityReportViewModule");
 
 export default function DeviceActivityReportView({
   style,
