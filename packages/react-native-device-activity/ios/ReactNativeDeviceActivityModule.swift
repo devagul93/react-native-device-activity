@@ -872,3 +872,33 @@ public class ReactNativeDeviceActivityViewPersistedModule: Module {
     }
   }
 }
+
+@available(iOS 16.0, *)
+public class DeviceActivityReportViewModule: Module {
+  public func definition() -> ExpoModulesCore.ModuleDefinition {
+    Name("DeviceActivityReportViewModule")
+    View(DeviceActivityReportView.self) {
+      // Defines props for the DeviceActivityReportView
+      Prop("familyActivitySelection") { (view: DeviceActivityReportView, prop: String) in
+        let selection = deserializeFamilyActivitySelection(familyActivitySelectionStr: prop)
+        view.model.familyActivitySelection = selection
+      }
+
+      Prop("context") { (view: DeviceActivityReportView, prop: String) in
+        view.model.context = prop
+      }
+
+      Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in
+        view.model.segmentation = prop
+      }
+
+      Prop("from") { (view: DeviceActivityReportView, prop: Double) in
+        view.model.from = Date(timeIntervalSince1970: prop / 1000)
+      }
+
+      Prop("to") { (view: DeviceActivityReportView, prop: Double) in
+        view.model.to = Date(timeIntervalSince1970: prop / 1000)
+      }
+    }
+  }
+}
