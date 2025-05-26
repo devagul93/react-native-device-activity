@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
 import DeviceActivitySelectionView from "./DeviceActivitySelectionView";
+import DeviceActivityReportView from "./DeviceActivityReport";
 import DeviceActivitySelectionViewPersisted from "./DeviceActivitySelectionViewPersisted";
 import {
   Action,
@@ -649,7 +650,11 @@ export function isAvailable(): boolean {
   );
 }
 
-export { DeviceActivitySelectionView, DeviceActivitySelectionViewPersisted };
+export {
+  DeviceActivitySelectionView,
+  DeviceActivitySelectionViewPersisted,
+  DeviceActivityReportView,
+};
 
 export type {
   DeviceActivitySelectionViewProps as ReactNativeDeviceActivityViewProps,
