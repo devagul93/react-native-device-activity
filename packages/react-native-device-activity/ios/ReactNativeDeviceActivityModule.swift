@@ -877,7 +877,7 @@ public class ReactNativeDeviceActivityViewPersistedModule: Module {
 public class DeviceActivityReportViewModule: Module {
   public func definition() -> ExpoModulesCore.ModuleDefinition {
     Name("DeviceActivityReportViewModule")
-    
+
     if #available(iOS 16.0, *) {
       View(DeviceActivityReportView.self) {
         // Defines props for the DeviceActivityReportView
