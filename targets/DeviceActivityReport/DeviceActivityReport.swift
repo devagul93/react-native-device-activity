@@ -20,6 +20,13 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
     AppListReport { appUsageData in
       AppListView(appUsageData: appUsageData)
     }
+
+    // Add the pickups report (iOS 16.0+)
+    if #available(iOS 16.0, *) {
+      PickupsReport { appPickupData in
+        PickupsView(appPickupData: appPickupData)
+      }
+    }
     // Add more reports here...
   }
 }

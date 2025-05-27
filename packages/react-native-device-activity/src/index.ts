@@ -345,6 +345,37 @@ export const getFamilyActivitySelectionId = (id: string) => {
   return previousValue[id];
 };
 
+/**
+ * Hook to get a stored family activity selection for use with DeviceActivityReportView
+ * @param selectionId The ID of the stored selection
+ * @returns The stored selection string or null if not found
+ */
+export const useDeviceActivityReportWithId = (selectionId: string): string | null => {
+  const [selection, setSelection] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (!selectionId?.trim()) {
+      console.warn('useDeviceActivityReportWithId: selectionId is empty or undefined');
+      setSelection(null);
+      return;
+    }
+    
+    try {
+      const storedSelection = getFamilyActivitySelectionId(selectionId.trim());
+      setSelection(storedSelection || null);
+      
+      if (!storedSelection) {
+        console.warn(`useDeviceActivityReportWithId: No stored selection found for ID '${selectionId}'`);
+      }
+    } catch (error) {
+      console.error('useDeviceActivityReportWithId: Error retrieving selection:', error);
+      setSelection(null);
+    }
+  }, [selectionId]);
+  
+  return selection;
+};
+
 export function getAppGroupFileDirectory(): string {
   return ReactNativeDeviceActivityModule?.getAppGroupFileDirectory() ?? "";
 }
