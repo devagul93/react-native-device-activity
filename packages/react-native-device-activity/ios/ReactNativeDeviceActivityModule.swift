@@ -904,15 +904,16 @@ public class DeviceActivityReportViewModule: Module {
       Prop("devices") { (view: DeviceActivityReportView, prop: [Int]?) in
         if #available(iOS 16.0, *), let viewModel = view.model as? DeviceActivityReportViewModel {
           if let deviceInts = prop {
-            let deviceModels = Set(deviceInts.compactMap { deviceInt -> DeviceActivityData.Device.Model? in
-              switch deviceInt {
-              case 0: return .iPad
-              case 1: return .iPhone
-              case 2: return .iPod
-              case 3: return .mac
-              default: return nil
-              }
-            })
+            let deviceModels = Set(
+              deviceInts.compactMap { deviceInt -> DeviceActivityData.Device.Model? in
+                switch deviceInt {
+                case 0: return .iPad
+                case 1: return .iPhone
+                case 2: return .iPod
+                case 3: return .mac
+                default: return nil
+                }
+              })
             viewModel.devices = DeviceActivityFilter.Devices(deviceModels)
           } else {
             viewModel.devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>())

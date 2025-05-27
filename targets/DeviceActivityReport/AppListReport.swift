@@ -28,11 +28,11 @@ struct AppListReport: DeviceActivityReportScene {
     -> [AppUsageData]
   {
     // Extract app names and their usage times from the data
-    // Note: The data is already filtered by the DeviceActivityFilter based on 
+    // Note: The data is already filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView
-    
+
     var appUsageMap: [String: TimeInterval] = [:]
-    
+
     // Process the data to extract app usage
     for dataPoint in data {
       for segment in dataPoint.activitySegments {
@@ -40,19 +40,19 @@ struct AppListReport: DeviceActivityReportScene {
           for application in category.applications {
             let appName = application.application.localizedDisplayName ?? "Unknown App"
             let duration = application.totalActivityDuration
-            
+
             // Accumulate duration for each app
             appUsageMap[appName, default: 0] += duration
           }
         }
       }
     }
-    
+
     // Convert to AppUsageData array and sort by duration (highest first)
     let appUsageData = appUsageMap.map { (appName, duration) in
       AppUsageData(appName: appName, duration: duration)
     }.sorted { $0.duration > $1.duration }
-    
+
     return appUsageData
   }
-} 
+}

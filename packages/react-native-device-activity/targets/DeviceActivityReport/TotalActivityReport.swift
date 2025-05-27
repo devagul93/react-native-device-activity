@@ -45,6 +45,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
       } */
 
-        return formatter.string(from: totalActivityDuration) ?? "No activity"
+    return formatter.string(from: totalActivityDuration) ?? "No activity"
   }
 }
