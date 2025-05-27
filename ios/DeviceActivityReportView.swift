@@ -20,7 +20,7 @@ class DeviceActivityReportViewModelBase: ObservableObject {
   @Published var from = Date.distantPast
   @Published var to = Date.distantPast
   @Published var segmentation: String = "daily"
-  
+
   init() {}
 }
 

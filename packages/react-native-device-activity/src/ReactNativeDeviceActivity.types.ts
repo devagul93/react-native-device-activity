@@ -78,6 +78,8 @@ export type DeviceActivityReportViewProps = PropsWithChildren<{
   devices?: DeviceActivityReportViewDevice[] | null;
   // null to select current user
   users?: "all" | "children" | null;
+  // context for selecting which report to show (e.g., "Total Activity", "App List")
+  context?: string;
 }>;
 
 /**

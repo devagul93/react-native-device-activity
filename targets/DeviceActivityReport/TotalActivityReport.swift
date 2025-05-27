@@ -25,7 +25,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
     // Reformat the data into a configuration that can be used to create
     // the report's view.
     let formatter = DateComponentsFormatter()
-    formatter.allowedUnits = [.day, .hour, .minute, .second]
+    formatter.allowedUnits = [.day, .hour, .minute]
     formatter.unitsStyle = .abbreviated
     formatter.zeroFormattingBehavior = .dropAll
 
@@ -45,6 +45,6 @@ struct TotalActivityReport: DeviceActivityReportScene {
         }
       } */
 
-    return "\(String(describing: formatter.string(from: totalActivityDuration)))"
+        return formatter.string(from: totalActivityDuration) ?? "No activity"
   }
 }

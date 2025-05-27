@@ -15,6 +15,11 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
     TotalActivityReport { totalActivity in
       TotalActivityView(totalActivity: totalActivity)
     }
+    
+    // Add the new app list report
+    AppListReport { appUsageData in
+      AppListView(appUsageData: appUsageData)
+    }
     // Add more reports here...
   }
 }
