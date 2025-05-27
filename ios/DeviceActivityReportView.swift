@@ -15,7 +15,7 @@ import SwiftUI
 // Helper function to convert reportStyle to property list compatible format
 func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
   var result: [String: Any] = [:]
-  
+
   for (key, value) in dict {
     if let nestedDict = value as? [String: Any] {
       // Convert nested dictionaries
@@ -42,7 +42,7 @@ func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
       result[key] = String(describing: value)
     }
   }
-  
+
   return result
 }
 
