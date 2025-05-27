@@ -1,6 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
-import { Button, Text, Title, Card } from 'react-native-paper';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  NativeSyntheticEvent,
+} from "react-native";
 import {
   DeviceActivityReportView,
   DeviceActivitySelectionViewPersisted,
@@ -8,42 +13,45 @@ import {
   getFamilyActivitySelectionId,
   useDeviceActivityReportWithId,
   ActivitySelectionMetadata,
-} from 'react-native-device-activity';
-import { NativeSyntheticEvent } from 'react-native';
+} from "react-native-device-activity";
+import { Button, Text, Title, Card } from "react-native-paper";
 
-
-const SELECTION_ID = 'report-example-selection';
-const INVALID_SELECTION_ID = 'non-existent-selection';
+const SELECTION_ID = "report-example-selection";
+const INVALID_SELECTION_ID = "non-existent-selection";
 
 export function DeviceActivityReportExample() {
   const [hasSelection, setHasSelection] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
-  const [testCase, setTestCase] = useState<'valid' | 'invalid' | 'both' | 'neither'>('valid');
-  
+  const [testCase, setTestCase] = useState<
+    "valid" | "invalid" | "both" | "neither"
+  >("valid");
+
   // Using the convenience hook
   const hookSelection = useDeviceActivityReportWithId(SELECTION_ID);
-  
+
   // Check if we have a stored selection
   useEffect(() => {
     const storedSelection = getFamilyActivitySelectionId(SELECTION_ID);
     setHasSelection(!!storedSelection);
   }, []);
-  
+
   const handleSelectionChange = (selection: any) => {
-    const { applicationCount, categoryCount, webDomainCount } = selection.nativeEvent;
-    const hasAnySelection = applicationCount > 0 || categoryCount > 0 || webDomainCount > 0;
+    const { applicationCount, categoryCount, webDomainCount } =
+      selection.nativeEvent;
+    const hasAnySelection =
+      applicationCount > 0 || categoryCount > 0 || webDomainCount > 0;
     setHasSelection(hasAnySelection);
     setShowPicker(false);
   };
-  
+
   const clearSelection = () => {
     setFamilyActivitySelectionId({
       id: SELECTION_ID,
-      familyActivitySelection: '', // Empty selection
+      familyActivitySelection: "", // Empty selection
     });
     setHasSelection(false);
   };
-  
+
   const renderTestCase = () => {
     const commonProps = {
       context: "Total Activity",
@@ -52,25 +60,25 @@ export function DeviceActivityReportExample() {
       to: Date.now(),
       style: styles.reportView,
     };
-    
+
     switch (testCase) {
-      case 'valid':
+      case "valid":
         return (
           <DeviceActivityReportView
             familyActivitySelectionId={SELECTION_ID}
             {...commonProps}
           />
         );
-        
-      case 'invalid':
+
+      case "invalid":
         return (
           <DeviceActivityReportView
             familyActivitySelectionId={INVALID_SELECTION_ID}
             {...commonProps}
           />
         );
-        
-      case 'both':
+
+      case "both":
         return (
           <DeviceActivityReportView
             familyActivitySelection={hookSelection}
@@ -78,41 +86,37 @@ export function DeviceActivityReportExample() {
             {...commonProps}
           />
         );
-        
-      case 'neither':
-        return (
-          <DeviceActivityReportView
-            {...commonProps}
-          />
-        );
-        
+
+      case "neither":
+        return <DeviceActivityReportView {...commonProps} />;
+
       default:
         return null;
     }
   };
-  
+
   return (
     <ScrollView style={styles.container}>
       <Title style={styles.title}>DeviceActivityReport with SelectionId</Title>
-      
+
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.subtitle}>Selection Status</Text>
-          <Text>Has stored selection: {hasSelection ? '✅' : '❌'}</Text>
-          <Text>Hook selection: {hookSelection ? '✅' : '❌'}</Text>
-          
+          <Text>Has stored selection: {hasSelection ? "✅" : "❌"}</Text>
+          <Text>Hook selection: {hookSelection ? "✅" : "❌"}</Text>
+
           <View style={styles.buttonRow}>
-            <Button 
-              mode="outlined" 
+            <Button
+              mode="outlined"
               onPress={() => setShowPicker(true)}
               style={styles.button}
             >
-              {hasSelection ? 'Change Selection' : 'Create Selection'}
+              {hasSelection ? "Change Selection" : "Create Selection"}
             </Button>
-            
+
             {hasSelection && (
-              <Button 
-                mode="outlined" 
+              <Button
+                mode="outlined"
                 onPress={clearSelection}
                 style={styles.button}
               >
@@ -122,64 +126,68 @@ export function DeviceActivityReportExample() {
           </View>
         </Card.Content>
       </Card>
-      
+
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.subtitle}>Test Cases</Text>
           <Text style={styles.description}>
             Select different test cases to see edge case handling:
           </Text>
-          
+
           <View style={styles.testCaseButtons}>
-            <Button 
-              mode={testCase === 'valid' ? 'contained' : 'outlined'}
-              onPress={() => setTestCase('valid')}
+            <Button
+              mode={testCase === "valid" ? "contained" : "outlined"}
+              onPress={() => setTestCase("valid")}
               style={styles.testButton}
             >
               Valid ID
             </Button>
-            
-            <Button 
-              mode={testCase === 'invalid' ? 'contained' : 'outlined'}
-              onPress={() => setTestCase('invalid')}
+
+            <Button
+              mode={testCase === "invalid" ? "contained" : "outlined"}
+              onPress={() => setTestCase("invalid")}
               style={styles.testButton}
             >
               Invalid ID
             </Button>
-            
-            <Button 
-              mode={testCase === 'both' ? 'contained' : 'outlined'}
-              onPress={() => setTestCase('both')}
+
+            <Button
+              mode={testCase === "both" ? "contained" : "outlined"}
+              onPress={() => setTestCase("both")}
               style={styles.testButton}
             >
               Both Props
             </Button>
-            
-            <Button 
-              mode={testCase === 'neither' ? 'contained' : 'outlined'}
-              onPress={() => setTestCase('neither')}
+
+            <Button
+              mode={testCase === "neither" ? "contained" : "outlined"}
+              onPress={() => setTestCase("neither")}
               style={styles.testButton}
             >
               Neither Prop
             </Button>
           </View>
-          
+
           <Text style={styles.testCaseDescription}>
-            {testCase === 'valid' && 'Uses familyActivitySelectionId with valid stored selection'}
-            {testCase === 'invalid' && 'Uses familyActivitySelectionId with non-existent ID (check console)'}
-            {testCase === 'both' && 'Provides both props - should warn and use familyActivitySelection'}
-            {testCase === 'neither' && 'Provides neither prop - should warn but show all activities'}
+            {testCase === "valid" &&
+              "Uses familyActivitySelectionId with valid stored selection"}
+            {testCase === "invalid" &&
+              "Uses familyActivitySelectionId with non-existent ID (check console)"}
+            {testCase === "both" &&
+              "Provides both props - should warn and use familyActivitySelection"}
+            {testCase === "neither" &&
+              "Provides neither prop - should warn but show all activities"}
           </Text>
         </Card.Content>
       </Card>
-      
+
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.subtitle}>DeviceActivityReport</Text>
           {renderTestCase()}
         </Card.Content>
       </Card>
-      
+
       {showPicker && (
         <Card style={styles.card}>
           <Card.Content>
@@ -188,10 +196,10 @@ export function DeviceActivityReportExample() {
               familyActivitySelectionId={SELECTION_ID}
               onSelectionChange={handleSelectionChange}
               style={styles.pickerView}
-              includeEntireCategory={true}
+              includeEntireCategory
             />
-            <Button 
-              mode="outlined" 
+            <Button
+              mode="outlined"
               onPress={() => setShowPicker(false)}
               style={styles.button}
             >
@@ -211,22 +219,22 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   card: {
     marginBottom: 16,
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   description: {
     marginBottom: 12,
-    color: '#666',
+    color: "#666",
   },
   buttonRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 12,
     gap: 8,
   },
@@ -234,30 +242,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   testCaseButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 8,
   },
   testButton: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: "45%",
   },
   testCaseDescription: {
     fontSize: 12,
-    color: '#666',
-    fontStyle: 'italic',
+    color: "#666",
+    fontStyle: "italic",
   },
   reportView: {
     height: 200,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
     marginVertical: 8,
   },
   pickerView: {
     height: 300,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
     marginVertical: 8,
   },
-}); 
+});

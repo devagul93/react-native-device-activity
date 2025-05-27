@@ -15,4 +15,4 @@ module.exports = (config) => {
     deploymentTarget: "15.0",
     frameworks: ["DeviceActivity", "SwiftUI"],
   };
-}; 
+};
