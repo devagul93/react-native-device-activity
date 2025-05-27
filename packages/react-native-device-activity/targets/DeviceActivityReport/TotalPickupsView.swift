@@ -26,12 +26,12 @@ struct TotalPickupsView_Previews: PreviewProvider {
     Group {
       TotalPickupsView(totalPickups: 42)
         .previewDisplayName("42 Pickups")
-      
+
       TotalPickupsView(totalPickups: 0)
         .previewDisplayName("0 Pickups")
-      
+
       TotalPickupsView(totalPickups: 1)
         .previewDisplayName("1 Pickup")
     }
   }
-} 
+}
