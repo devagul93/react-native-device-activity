@@ -484,4 +484,213 @@ The Pickups report provides valuable insights into digital wellness:
 - Low pickup count with high duration suggests focused usage sessions
 - Comparing pickup patterns across different time periods can reveal usage trends
 
-**Privacy Note**: All pickup data is processed locally on the device and follows Apple's privacy guidelines for Screen Time data. 
+**Privacy Note**: All pickup data is processed locally on the device and follows Apple's privacy guidelines for Screen Time data.
+
+## Total Pickups Report Example
+
+The Total Pickups report shows a simple, focused view of the total number of app pickups across all selected apps, similar to the Total Activity report but for pickup counts instead of duration.
+
+**Note**: The Total Pickups report requires iOS 16.0+ and uses the `numberOfPickups` property from `DeviceActivityData.ApplicationActivity`.
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+export default function TotalPickupsReportExample() {
+  const [familyActivitySelection, setFamilyActivitySelection] = useState<string | null>(null);
+
+  // Set date range for today
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Total App Pickups Today</Text>
+      
+      <DeviceActivityReportView
+        style={styles.reportView}
+        context="Total Pickups"  // Use the Total Pickups context
+        familyActivitySelection={familyActivitySelection}
+        from={startOfDay.getTime()}
+        to={endOfDay.getTime()}
+        segmentation="daily"
+        users="all"
+        devices={null} // All devices
+      />
+      
+      <Text style={styles.description}>
+        This shows the total number of times you opened apps today.
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  reportView: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 16,
+  },
+  description: {
+    fontSize: 14,
+    color: '#6c757d',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+});
+```
+
+### Comparing Total Pickups vs Detailed Pickups
+
+You can use both contexts to provide different levels of detail:
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+export default function PickupsComparisonExample() {
+  const [viewMode, setViewMode] = useState<'total' | 'detailed'>('total');
+  const [familyActivitySelection, setFamilyActivitySelection] = useState<string | null>(null);
+
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>App Pickups Analysis</Text>
+      
+      {/* View Mode Toggle */}
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity
+          style={[styles.toggleButton, viewMode === 'total' && styles.toggleButtonActive]}
+          onPress={() => setViewMode('total')}
+        >
+          <Text style={[styles.toggleText, viewMode === 'total' && styles.toggleTextActive]}>
+            Total Count
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleButton, viewMode === 'detailed' && styles.toggleButtonActive]}
+          onPress={() => setViewMode('detailed')}
+        >
+          <Text style={[styles.toggleText, viewMode === 'detailed' && styles.toggleTextActive]}>
+            Detailed List
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      <DeviceActivityReportView
+        style={styles.reportView}
+        context={viewMode === 'total' ? 'Total Pickups' : 'Pickups'}
+        familyActivitySelection={familyActivitySelection}
+        from={startOfDay.getTime()}
+        to={endOfDay.getTime()}
+        segmentation="daily"
+        users="all"
+        devices={null}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#e9ecef',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 16,
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  toggleButtonActive: {
+    backgroundColor: '#007AFF',
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6c757d',
+  },
+  toggleTextActive: {
+    color: 'white',
+  },
+  reportView: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+});
+```
+
+### Available Report Contexts
+
+The library now supports multiple report contexts for different types of insights:
+
+| Context | Description | Data Shown | iOS Version | Registration Status |
+|---------|-------------|------------|-------------|-------------------|
+| `"Total Activity"` | Total usage duration | Time spent across all apps | iOS 15.0+ | ✅ Registered |
+| `"App List"` | Detailed app usage | List of apps with usage times | iOS 15.0+ | ✅ Registered |
+| `"Pickups"` | Detailed pickup analysis | List of apps with pickup counts | iOS 16.0+ | ✅ Registered |
+| `"Total Pickups"` | Simple pickup summary | Total pickup count across apps | iOS 16.0+ | ✅ Registered |
+
+**✅ All contexts are properly registered and should work automatically with the `DeviceActivityReportView` component.**
+
+### Module Registration Status
+
+The pickup-related views are properly integrated into the Expo module system:
+
+1. **DeviceActivityReportView** - ✅ Registered as native view manager
+2. **Context Handling** - ✅ Dynamic context creation via `DeviceActivityReport.Context(rawValue: model.context)`
+3. **iOS Extension** - ✅ Both `PickupsReport` and `TotalPickupsReport` registered in `DeviceActivityReportUI`
+4. **React Native Export** - ✅ `DeviceActivityReportView` exported from main index
+
+Choose the context that best fits your UI and user experience needs. 

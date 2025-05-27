@@ -21,6 +21,7 @@ import {
 } from "react-native-device-activity";
 
 import { ActivityPickerPersisted } from "../components/ActivityPicker";
+import ContextTestScreen from "./ContextTestScreen";
 
 // const initialMinutes = 1;
 // const postponeMinutes = 60;
@@ -249,6 +250,18 @@ export function AllTheThings() {
         />
 
         <Button title="Get events" onPress={refreshEvents} />
+
+        <Button
+          title="🧪 Test Report Contexts"
+          onPress={() => {
+            // For now, just show an alert. In a real app, you'd navigate to the screen
+            Alert.alert(
+              "Context Test",
+              "This would navigate to the ContextTestScreen to test all DeviceActivityReport contexts (Total Activity, App List, Pickups, Total Pickups)",
+              [{ text: "OK" }]
+            );
+          }}
+        />
 
         <Button
           title="Block all apps"

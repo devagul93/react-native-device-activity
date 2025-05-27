@@ -28,6 +28,11 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
       PickupsView(appPickupData: appPickupData)
     }
 
+    // Add the total pickups report (iOS 16.0+)
+    TotalPickupsReport { totalPickups in
+      TotalPickupsView(totalPickups: totalPickups)
+    }
+
     // Add more reports here...
   }
 }
