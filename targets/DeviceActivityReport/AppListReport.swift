@@ -34,10 +34,10 @@ struct AppListReport: DeviceActivityReportScene {
     var appUsageMap: [String: TimeInterval] = [:]
 
     // Process the data to extract app usage
-    for dataPoint in data {
-      for segment in dataPoint.activitySegments {
-        for category in segment.categories {
-          for application in category.applications {
+    for await dataPoint in data {
+      for await segment in dataPoint.activitySegments {
+        for await category in segment.categories {
+          for await application in category.applications {
             let appName = application.application.localizedDisplayName ?? "Unknown App"
             let duration = application.totalActivityDuration
 
