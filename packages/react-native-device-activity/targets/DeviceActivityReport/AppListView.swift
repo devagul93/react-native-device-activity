@@ -6,80 +6,104 @@
 //
 
 import SwiftUI
+import FamilyControls
+
+struct AppIconView: View {
+  let token: ApplicationToken?
+  let appName: String
+  
+  private func iconColor(for appName: String) -> Color {
+    let colors: [Color] = [.blue, .green, .orange, .red, .purple, .pink, .indigo, .teal]
+    let index = abs(appName.hashValue) % colors.count
+    return colors[index]
+  }
+  
+  var body: some View {
+    // For now, create attractive placeholder icons since direct app icon extraction
+    // from ApplicationToken isn't straightforward in DeviceActivity extensions
+    RoundedRectangle(cornerRadius: 5)
+      .fill(iconColor(for: appName))
+      .frame(width: 24, height: 24)
+      .overlay(
+        Text(String(appName.prefix(1).uppercased()))
+          .font(.system(size: 12, weight: .semibold))
+          .foregroundColor(.white)
+      )
+      .shadow(radius: 1, x: 0, y: 1)
+  }
+}
 
 struct AppListView: View {
   let appUsageData: [AppUsageData]
 
   private func formatDuration(_ duration: TimeInterval) -> String {
-    let formatter = DateComponentsFormatter()
-    formatter.allowedUnits = [.day, .hour, .minute]
-    formatter.unitsStyle = .abbreviated
-    formatter.zeroFormattingBehavior = .dropAll
-
-    return formatter.string(from: duration) ?? "0m"
+    let hours = Int(duration) / 3600
+    let minutes = Int(duration % 3600) / 60
+    
+    if hours > 0 {
+      return "\(hours)h:\(String(format: "%02d", minutes))m"
+    } else {
+      return "\(minutes)m"
+    }
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 0) {
+      // Header
+      HStack {
+        Text("BLOCKED APPS")
+          .font(.subheadline)
+          .fontWeight(.medium)
+          .foregroundColor(.secondary)
+        
+        Spacer()
+        
+        Text("AVG TIME")
+          .font(.subheadline)
+          .fontWeight(.medium)
+          .foregroundColor(.secondary)
+      }
+      .padding(.horizontal, 16)
+      .padding(.top, 16)
+      .padding(.bottom, 8)
+      
       if appUsageData.isEmpty {
         Text("No app usage data")
           .font(.subheadline)
           .foregroundColor(.secondary)
           .padding()
       } else {
-        Text("App Usage")
-          .font(.headline)
-          .padding(.horizontal)
-          .padding(.top)
-
-        ScrollView {
-          LazyVStack(alignment: .leading, spacing: 4) {
-            ForEach(Array(appUsageData.enumerated()), id: \.offset) { index, appData in
-              HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                  Text(appData.appName)
-                    .font(.body)
-                    .fontWeight(.medium)
-
-                  Text(formatDuration(appData.duration))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                }
-
-                Spacer()
-
-                // Optional: Add a visual indicator for usage amount
-                Circle()
-                  .fill(colorForUsage(appData.duration))
-                  .frame(width: 8, height: 8)
-              }
-              .padding(.horizontal)
-              .padding(.vertical, 4)
-
-              if index < appUsageData.count - 1 {
-                Divider()
-                  .padding(.horizontal)
-              }
+        VStack(spacing: 0) {
+          ForEach(Array(appUsageData.enumerated()), id: \.offset) { index, appData in
+            HStack(spacing: 12) {
+              // App icon
+              AppIconView(token: appData.appToken, appName: appData.appName)
+              
+              Text(appData.appName)
+                .font(.body)
+                .foregroundColor(.primary)
+              
+              Spacer()
+              
+              Text(formatDuration(appData.duration))
+                .font(.body)
+                .foregroundColor(.primary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            
+            if index < appUsageData.count - 1 {
+              Divider()
+                .padding(.leading, 52) // Align with text, not icon
             }
           }
         }
-        .padding(.bottom)
       }
+      
+      Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .background(Color(.systemBackground))
-  }
-
-  private func colorForUsage(_ duration: TimeInterval) -> Color {
-    let minutes = duration / 60
-
-    if minutes < 30 {
-      return .green
-    } else if minutes < 120 {
-      return .orange
-    } else {
-      return .red
-    }
   }
 }
 

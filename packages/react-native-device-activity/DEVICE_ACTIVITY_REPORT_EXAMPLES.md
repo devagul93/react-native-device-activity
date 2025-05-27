@@ -60,6 +60,482 @@ const MyReportWithHook = ({ selectionId }: { selectionId: string }) => {
 };
 ```
 
+## App List Report Example
+
+The App List report displays detailed information about app usage, showing each app with its usage time in a clean, organized list format. This report is perfect for creating blocked apps screens or detailed usage breakdowns similar to iOS Settings > Screen Time.
+
+**Features:**
+- Shows app names with colorful icons (first letter of app name)
+- Displays usage time in "Xh:XXm" format (e.g., "1h:50m", "24m")
+- Header shows "BLOCKED APPS" and "AVG TIME"
+- Apps are sorted by usage time (highest first)
+- Supports both selected apps and all apps on device
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+export default function AppListReportExample() {
+  const [familyActivitySelection, setFamilyActivitySelection] = useState<string | null>(null);
+
+  // Set date range for today
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>App Usage Details</Text>
+      
+      <DeviceActivityReportView
+        style={styles.reportView}
+        context="App List"  // Use the App List context
+        familyActivitySelection={familyActivitySelection}
+        from={startOfDay.getTime()}
+        to={endOfDay.getTime()}
+        segmentation="daily"
+        users="all"
+        devices={null} // All devices
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  reportView: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 0, // No padding to let the native view handle its own layout
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+});
+```
+
+### Blocked Apps Report
+
+Create a blocked apps screen similar to iOS Screen Time restrictions:
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { 
+  DeviceActivityReportView, 
+  DeviceActivitySelectionView,
+  useDeviceActivityReportWithId 
+} from 'react-native-device-activity';
+
+export default function BlockedAppsReport() {
+  const [showSelection, setShowSelection] = useState(false);
+  const familyActivitySelection = useDeviceActivityReportWithId('blocked-apps');
+
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Screen Time Restrictions</Text>
+      
+      <Button
+        title={familyActivitySelection ? "Change Blocked Apps" : "Select Apps to Block"}
+        onPress={() => setShowSelection(!showSelection)}
+      />
+
+      {showSelection && (
+        <DeviceActivitySelectionView
+          style={styles.selectionView}
+          familyActivitySelectionId="blocked-apps"
+          headerText="Select apps to block"
+          footerText="These apps will be restricted during scheduled times"
+          onSelectionChange={(event) => {
+            console.log('Blocked apps selection changed:', event.nativeEvent);
+            setShowSelection(false);
+          }}
+        />
+      )}
+
+      {familyActivitySelection && (
+        <DeviceActivityReportView
+          style={styles.reportView}
+          context="App List"
+          familyActivitySelectionId="blocked-apps"
+          from={startOfDay.getTime()}
+          to={endOfDay.getTime()}
+          segmentation="daily"
+          users="all"
+          devices={null}
+        />
+      )}
+
+      {!familyActivitySelection && (
+        <View style={styles.placeholderView}>
+          <Text style={styles.placeholderText}>
+            No apps selected for blocking
+          </Text>
+          <Text style={styles.placeholderSubtext}>
+            Select apps above to see their usage details
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  selectionView: {
+    height: 300,
+    marginVertical: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+  reportView: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  placeholderView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    marginTop: 16,
+    padding: 32,
+  },
+  placeholderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#6c757d',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  placeholderSubtext: {
+    fontSize: 14,
+    color: '#adb5bd',
+    textAlign: 'center',
+  },
+});
+```
+
+### Weekly App Usage Report
+
+View app usage patterns over a week using the App List context:
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+export default function WeeklyAppUsageReport() {
+  const [familyActivitySelection, setFamilyActivitySelection] = useState<string | null>(null);
+
+  // Get the last 7 days
+  const today = new Date();
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Weekly App Usage</Text>
+      <Text style={styles.subtitle}>Past 7 days usage breakdown</Text>
+      
+      <DeviceActivityReportView
+        style={styles.reportView}
+        context="App List"
+        familyActivitySelection={familyActivitySelection}
+        from={sevenDaysAgo.getTime()}
+        to={today.getTime()}
+        segmentation="daily"  // Shows daily breakdown within the week
+        users="all"
+        devices={null}
+      />
+      
+      <View style={styles.infoBox}>
+        <Text style={styles.infoTitle}>Understanding Your Usage</Text>
+        <Text style={styles.infoText}>
+          • Apps are sorted by total usage time{'\n'}
+          • Time format: hours and minutes (e.g., 2h:30m){'\n'}
+          • Includes both active usage and background time{'\n'}
+          • Data is averaged across selected time period
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 16,
+    color: '#1c1c1e',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6c757d',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  reportView: {
+    height: 400, // Fixed height for scrollable content
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  infoBox: {
+    backgroundColor: '#e3f2fd',
+    margin: 16,
+    padding: 20,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196f3',
+  },
+  infoTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1565c0',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#424242',
+    lineHeight: 20,
+  },
+});
+```
+
+### App List vs Other Contexts
+
+Compare different report contexts to understand their use cases:
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+type ReportContext = 'App List' | 'Total Activity' | 'Pickups' | 'Total Pickups';
+
+export default function ReportContextComparison() {
+  const [activeContext, setActiveContext] = useState<ReportContext>('App List');
+  const [familyActivitySelection, setFamilyActivitySelection] = useState<string | null>(null);
+
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  const contexts: Array<{
+    key: ReportContext;
+    title: string;
+    description: string;
+  }> = [
+    {
+      key: 'App List',
+      title: 'App List',
+      description: 'Detailed list of apps with usage times and icons'
+    },
+    {
+      key: 'Total Activity',
+      title: 'Total Activity',
+      description: 'Simple total screen time across all apps'
+    },
+    {
+      key: 'Pickups',
+      title: 'Pickups',
+      description: 'List of apps with pickup counts (how many times opened)'
+    },
+    {
+      key: 'Total Pickups',
+      title: 'Total Pickups',
+      description: 'Total number of app pickups'
+    }
+  ];
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Report Context Comparison</Text>
+      
+      {/* Context Selector */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.contextSelector}>
+        {contexts.map(({ key, title, description }) => (
+          <TouchableOpacity
+            key={key}
+            style={[
+              styles.contextButton,
+              activeContext === key && styles.contextButtonActive
+            ]}
+            onPress={() => setActiveContext(key)}
+          >
+            <Text style={[
+              styles.contextButtonText,
+              activeContext === key && styles.contextButtonTextActive
+            ]}>
+              {title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Context Description */}
+      <View style={styles.descriptionBox}>
+        <Text style={styles.descriptionText}>
+          {contexts.find(c => c.key === activeContext)?.description}
+        </Text>
+      </View>
+      
+      {/* Report View */}
+      <DeviceActivityReportView
+        style={styles.reportView}
+        context={activeContext}
+        familyActivitySelection={familyActivitySelection}
+        from={startOfDay.getTime()}
+        to={endOfDay.getTime()}
+        segmentation="daily"
+        users="all"
+        devices={null}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  contextSelector: {
+    marginBottom: 16,
+  },
+  contextButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 8,
+    backgroundColor: '#e9ecef',
+    borderRadius: 20,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  contextButtonActive: {
+    backgroundColor: '#007AFF',
+  },
+  contextButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6c757d',
+  },
+  contextButtonTextActive: {
+    color: 'white',
+  },
+  descriptionBox: {
+    backgroundColor: '#fff3cd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ffc107',
+  },
+  descriptionText: {
+    fontSize: 14,
+    color: '#856404',
+    fontStyle: 'italic',
+  },
+  reportView: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+});
+```
+
+### App List Features
+
+The App List context provides rich functionality:
+
+**Visual Features:**
+- **Colorful App Icons**: Each app gets a unique colored icon with the first letter of its name
+- **Usage Time Display**: Shows time in readable format (e.g., "2h:15m", "45m")
+- **Clean Headers**: "BLOCKED APPS" and "AVG TIME" headers for clarity
+- **Sorted List**: Apps automatically sorted by usage time (highest first)
+
+**Data Features:**
+- **Application Tokens**: Properly extracts all apps from FamilyActivitySelection
+- **Web Domains**: Includes web usage if selected in FamilyActivityPicker
+- **Time Aggregation**: Combines usage across multiple sessions
+- **Fallback Handling**: Gracefully handles apps without tokens
+
+**Use Cases:**
+- Screen Time restriction interfaces
+- Parental control apps
+- Digital wellness dashboards
+- Usage analytics screens
+- App blocking confirmation views
+
 ## Edge Cases and Error Handling
 
 ### 1. Both Props Provided
@@ -678,7 +1154,7 @@ The library now supports multiple report contexts for different types of insight
 | Context | Description | Data Shown | iOS Version | Registration Status |
 |---------|-------------|------------|-------------|-------------------|
 | `"Total Activity"` | Total usage duration | Time spent across all apps | iOS 15.0+ | ✅ Registered |
-| `"App List"` | Detailed app usage | List of apps with usage times | iOS 15.0+ | ✅ Registered |
+| `"App List"` | Detailed app usage with visual list | App names with colorful icons, usage times in "Xh:XXm" format, "BLOCKED APPS"/"AVG TIME" headers | iOS 15.0+ | ✅ Registered |
 | `"Pickups"` | Detailed pickup analysis | List of apps with pickup counts | iOS 16.0+ | ✅ Registered |
 | `"Total Pickups"` | Simple pickup summary | Total pickup count across apps | iOS 16.0+ | ✅ Registered |
 
