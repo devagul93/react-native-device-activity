@@ -21,7 +21,9 @@ struct TotalPickupsReport: DeviceActivityReportScene {
   // Define the custom configuration and the resulting view for this report.
   let content: (Int, [String: Any]?) -> TotalPickupsView
 
-  func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> (Int, [String: Any]?) {
+  func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> (
+    Int, [String: Any]?
+  ) {
     // Calculate the total number of pickups across all apps
     // Note: The data is already filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView

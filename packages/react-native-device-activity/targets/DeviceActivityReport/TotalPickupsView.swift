@@ -20,20 +20,20 @@ struct TotalPickupsView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: getFrameAlignment())
       .background(getBackgroundColor())
   }
-  
+
   private func getFont() -> Font {
     let fontSize = reportStyle?["fontSize"] as? Double ?? 48.0
     let fontWeight = getFontWeight()
     let fontDesign = getFontDesign()
-    
+
     return .system(size: fontSize, weight: fontWeight, design: fontDesign)
   }
-  
+
   private func getFontWeight() -> Font.Weight {
     guard let weightString = reportStyle?["fontWeight"] as? String else {
       return .bold
     }
-    
+
     switch weightString {
     case "ultraLight": return .ultraLight
     case "thin": return .thin
@@ -47,12 +47,12 @@ struct TotalPickupsView: View {
     default: return .bold
     }
   }
-  
+
   private func getFontDesign() -> Font.Design {
     guard let designString = reportStyle?["fontDesign"] as? String else {
       return .rounded
     }
-    
+
     switch designString {
     case "default": return .default
     case "rounded": return .rounded
@@ -61,24 +61,25 @@ struct TotalPickupsView: View {
     default: return .rounded
     }
   }
-  
+
   private func getTextColor() -> Color {
     guard let colorDict = reportStyle?["textColor"] as? [String: Any],
-          let red = colorDict["red"] as? Double,
-          let green = colorDict["green"] as? Double,
-          let blue = colorDict["blue"] as? Double else {
+      let red = colorDict["red"] as? Double,
+      let green = colorDict["green"] as? Double,
+      let blue = colorDict["blue"] as? Double
+    else {
       return .primary
     }
-    
+
     let alpha = colorDict["alpha"] as? Double ?? 1.0
     return Color(.sRGB, red: red / 255.0, green: green / 255.0, blue: blue / 255.0, opacity: alpha)
   }
-  
+
   private func getTextAlignment() -> TextAlignment {
     guard let alignmentString = reportStyle?["textAlignment"] as? String else {
       return .center
     }
-    
+
     switch alignmentString {
     case "leading": return .leading
     case "center": return .center
@@ -86,12 +87,12 @@ struct TotalPickupsView: View {
     default: return .center
     }
   }
-  
+
   private func getFrameAlignment() -> Alignment {
     guard let alignmentString = reportStyle?["textAlignment"] as? String else {
       return .center
     }
-    
+
     switch alignmentString {
     case "leading": return .leading
     case "center": return .center
@@ -99,18 +100,19 @@ struct TotalPickupsView: View {
     default: return .center
     }
   }
-  
+
   private func getBackgroundColor() -> Color {
     // Check if backgroundColor is explicitly set to null or has alpha 0 for transparency
     if let backgroundColorDict = reportStyle?["backgroundColor"] as? [String: Any] {
       if let red = backgroundColorDict["red"] as? Double,
-         let green = backgroundColorDict["green"] as? Double,
-         let blue = backgroundColorDict["blue"] as? Double {
+        let green = backgroundColorDict["green"] as? Double,
+        let blue = backgroundColorDict["blue"] as? Double {
         let alpha = backgroundColorDict["alpha"] as? Double ?? 1.0
-        return Color(.sRGB, red: red / 255.0, green: green / 255.0, blue: blue / 255.0, opacity: alpha)
+        return Color(
+          .sRGB, red: red / 255.0, green: green / 255.0, blue: blue / 255.0, opacity: alpha)
       }
     }
-    
+
     // Default to transparent background so React Native background shows through
     return Color.clear
   }
@@ -122,13 +124,13 @@ struct TotalPickupsView_Previews: PreviewProvider {
     Group {
       TotalPickupsView(totalPickups: 42, reportStyle: nil)
         .previewDisplayName("42 Pickups - Default Style")
-      
+
       TotalPickupsView(totalPickups: 0, reportStyle: nil)
         .previewDisplayName("0 Pickups - Default Style")
-      
+
       TotalPickupsView(totalPickups: 1, reportStyle: nil)
         .previewDisplayName("1 Pickup - Default Style")
-      
+
       TotalPickupsView(
         totalPickups: 25,
         reportStyle: [
