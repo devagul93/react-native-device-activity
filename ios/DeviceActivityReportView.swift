@@ -12,6 +12,40 @@ import FamilyControls
 import Foundation
 import SwiftUI
 
+// Helper function to convert reportStyle to property list compatible format
+func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
+  var result: [String: Any] = [:]
+  
+  for (key, value) in dict {
+    if let nestedDict = value as? [String: Any] {
+      // Convert nested dictionaries
+      result[key] = convertToPropertyListCompatible(nestedDict)
+    } else if value is NSNull {
+      // Convert NSNull to a string representation
+      result[key] = "null"
+    } else if value is String || value is NSNumber || value is Bool {
+      // These are already property list compatible
+      result[key] = value
+    } else if let arrayValue = value as? [Any] {
+      // Convert arrays recursively
+      result[key] = arrayValue.map { item -> Any in
+        if let dictItem = item as? [String: Any] {
+          return convertToPropertyListCompatible(dictItem)
+        } else if item is NSNull {
+          return "null"
+        } else {
+          return item
+        }
+      }
+    } else {
+      // Convert other types to string representation
+      result[key] = String(describing: value)
+    }
+  }
+  
+  return result
+}
+
 // Base view model that works on iOS 15.0+
 @available(iOS 15.0, *)
 class DeviceActivityReportViewModelBase: ObservableObject {
@@ -100,7 +134,9 @@ struct DeviceActivityReportUI: View {
       // Store reportStyle in UserDefaults so the extension can access it
       if let reportStyle = model.reportStyle {
         let contextKey = "reportStyle_\(model.context)"
-        userDefaults?.set(reportStyle, forKey: contextKey)
+        // Convert to property list compatible format
+        let propertyListStyle = convertToPropertyListCompatible(reportStyle)
+        userDefaults?.set(propertyListStyle, forKey: contextKey)
       }
     }
   }

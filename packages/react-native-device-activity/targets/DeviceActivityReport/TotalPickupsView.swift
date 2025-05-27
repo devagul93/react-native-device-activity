@@ -108,10 +108,17 @@ struct TotalPickupsView: View {
 
   private func getBackgroundColor() -> Color {
     // Check if backgroundColor is explicitly set to null or has alpha 0 for transparency
-    if let backgroundColorDict = reportStyle?["backgroundColor"] as? [String: Any] {
-      if let red = backgroundColorDict["red"] as? Double,
-        let green = backgroundColorDict["green"] as? Double,
-        let blue = backgroundColorDict["blue"] as? Double {
+    if let backgroundColorValue = reportStyle?["backgroundColor"] {
+      // Handle the case where backgroundColor is stored as "null" string
+      if let backgroundColorString = backgroundColorValue as? String, backgroundColorString == "null" {
+        return Color.clear
+      }
+      
+      // Handle the case where backgroundColor is a dictionary with color values
+      if let backgroundColorDict = backgroundColorValue as? [String: Any],
+         let red = backgroundColorDict["red"] as? Double,
+         let green = backgroundColorDict["green"] as? Double,
+         let blue = backgroundColorDict["blue"] as? Double {
         let alpha = backgroundColorDict["alpha"] as? Double ?? 1.0
         return Color(
           .sRGB, red: red / 255.0, green: green / 255.0, blue: blue / 255.0, opacity: alpha)
