@@ -22,11 +22,12 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
     }
 
     // Add the pickups report (iOS 16.0+)
-    if #available(iOS 16.0, *) {
-      PickupsReport { appPickupData in
-        PickupsView(appPickupData: appPickupData)
-      }
+    // Note: Since PickupsReport is already marked with @available(iOS 16.0, *),
+    // we can include it directly here. The availability check is handled at the type level.
+    PickupsReport { appPickupData in
+      PickupsView(appPickupData: appPickupData)
     }
+    
     // Add more reports here...
   }
 }
