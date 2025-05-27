@@ -10,7 +10,12 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct TotalPickupsView: View {
   let totalPickups: Int
-  let reportStyle: [String: Any]?
+  
+  // Get reportStyle from UserDefaults
+  private var reportStyle: [String: Any]? {
+    let contextKey = "reportStyle_Total Pickups"
+    return userDefaults?.dictionary(forKey: contextKey)
+  }
 
   var body: some View {
     Text("\(totalPickups)")
@@ -122,29 +127,17 @@ struct TotalPickupsView: View {
 struct TotalPickupsView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
-      TotalPickupsView(totalPickups: 42, reportStyle: nil)
-        .previewDisplayName("42 Pickups - Default Style")
+      TotalPickupsView(totalPickups: 42)
+        .previewDisplayName("42 Pickups")
 
-      TotalPickupsView(totalPickups: 0, reportStyle: nil)
-        .previewDisplayName("0 Pickups - Default Style")
+      TotalPickupsView(totalPickups: 0)
+        .previewDisplayName("0 Pickups")
 
-      TotalPickupsView(totalPickups: 1, reportStyle: nil)
-        .previewDisplayName("1 Pickup - Default Style")
+      TotalPickupsView(totalPickups: 1)
+        .previewDisplayName("1 Pickup")
 
-      TotalPickupsView(
-        totalPickups: 25,
-        reportStyle: [
-          "fontSize": 64.0,
-          "fontWeight": "heavy",
-          "textColor": [
-            "red": 255.0,
-            "green": 59.0,
-            "blue": 48.0,
-            "alpha": 1.0
-          ]
-        ]
-      )
-      .previewDisplayName("25 Pickups - Custom Style")
+      TotalPickupsView(totalPickups: 25)
+        .previewDisplayName("25 Pickups")
     }
   }
 }

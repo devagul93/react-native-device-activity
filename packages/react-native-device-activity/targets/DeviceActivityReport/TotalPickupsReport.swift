@@ -19,11 +19,9 @@ struct TotalPickupsReport: DeviceActivityReportScene {
   let context: DeviceActivityReport.Context = .totalPickups
 
   // Define the custom configuration and the resulting view for this report.
-  let content: (Int, [String: Any]?) -> TotalPickupsView
+  let content: (Int) -> TotalPickupsView
 
-  func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> (
-    Int, [String: Any]?
-  ) {
+  func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> Int {
     // Calculate the total number of pickups across all apps
     // Note: The data is already filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView
@@ -41,10 +39,6 @@ struct TotalPickupsReport: DeviceActivityReportScene {
       }
     }
 
-    // Get reportStyle from UserDefaults
-    let contextKey = "reportStyle_Total Pickups"
-    let reportStyle = userDefaults?.dictionary(forKey: contextKey)
-
-    return (totalPickups, reportStyle)
+    return totalPickups
   }
-}
+} 
