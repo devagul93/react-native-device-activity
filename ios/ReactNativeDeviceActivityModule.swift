@@ -887,22 +887,29 @@ public class DeviceActivityReportViewModule: Module {
 
       // NEW: Handle familyActivitySelectionId prop with edge cases
       Prop("familyActivitySelectionId") { (view: DeviceActivityReportView, prop: String?) in
-        guard let selectionId = prop, !selectionId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard let selectionId = prop,
+          !selectionId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else {
           // Edge case: nil or empty/whitespace-only string - use empty selection
-          logger.log("⚠️ DeviceActivityReportView: familyActivitySelectionId is nil or empty, using empty selection")
+          logger.log(
+            "⚠️ DeviceActivityReportView: familyActivitySelectionId is nil or empty, using empty selection"
+          )
           view.model.familyActivitySelection = FamilyActivitySelection()
           return
         }
-        
+
         let trimmedId = selectionId.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         if let storedSelection = getFamilyActivitySelectionById(id: trimmedId) {
           // Successfully retrieved stored selection
           view.model.familyActivitySelection = storedSelection
-          logger.log("✅ DeviceActivityReportView: Successfully loaded selection for ID: \(trimmedId)")
+          logger.log(
+            "✅ DeviceActivityReportView: Successfully loaded selection for ID: \(trimmedId)")
         } else {
           // Edge case: Selection ID not found - log warning and use empty selection
-          logger.log("⚠️ DeviceActivityReportView: No stored selection found for ID '\(trimmedId)'. Using empty selection. Available IDs: \(getFamilyActivitySelectionIds().map { $0.id })")
+          logger.log(
+            "⚠️ DeviceActivityReportView: No stored selection found for ID '\(trimmedId)'. Using empty selection. Available IDs: \(getFamilyActivitySelectionIds().map { $0.id })"
+          )
           view.model.familyActivitySelection = FamilyActivitySelection()
         }
       }

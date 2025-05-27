@@ -44,7 +44,7 @@ struct PickupsView: View {
       } else {
         // Total pickups summary
         let totalPickups = appPickupData.reduce(0) { $0 + $1.numberOfPickups }
-        
+
         HStack {
           VStack(alignment: .leading, spacing: 4) {
             Text("Total Pickups")
@@ -110,7 +110,7 @@ struct PickupRowView: View {
           .font(.body)
           .fontWeight(.medium)
           .lineLimit(1)
-        
+
         Text(formattedDuration)
           .font(.caption)
           .foregroundColor(.secondary)
@@ -124,7 +124,7 @@ struct PickupRowView: View {
           .font(.title3)
           .fontWeight(.semibold)
           .foregroundColor(.primary)
-        
+
         Text(appData.numberOfPickups == 1 ? "pickup" : "pickups")
           .font(.caption2)
           .foregroundColor(.secondary)
@@ -146,4 +146,4 @@ struct PickupsView_Previews: PreviewProvider {
       AppPickupData(appName: "Safari", numberOfPickups: 12, totalDuration: 2400),
     ])
   }
-} 
+}

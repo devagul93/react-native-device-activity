@@ -68,4 +68,4 @@ struct PickupsReport: DeviceActivityReportScene {
 
     return appPickupData
   }
-} 
+}
