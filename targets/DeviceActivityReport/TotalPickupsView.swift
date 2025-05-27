@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct TotalPickupsView: View {
   let totalPickups: Int
-  
+
   // Get reportStyle from UserDefaults
   private var reportStyle: [String: Any]? {
     let contextKey = "reportStyle_Total Pickups"

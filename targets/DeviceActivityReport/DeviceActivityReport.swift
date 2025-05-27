@@ -35,4 +35,4 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
 
     // Add more reports here...
   }
-} 
+}

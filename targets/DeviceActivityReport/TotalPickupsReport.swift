@@ -41,4 +41,4 @@ struct TotalPickupsReport: DeviceActivityReportScene {
 
     return totalPickups
   }
-} 
+}
