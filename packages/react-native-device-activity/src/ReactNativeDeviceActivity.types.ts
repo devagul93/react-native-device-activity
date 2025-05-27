@@ -71,12 +71,12 @@ export enum DeviceActivityReportViewDevice {
 export type DeviceActivityReportViewProps = PropsWithChildren<{
   style: StyleProp<ViewStyle>;
   /**
-   * Serialized FamilyActivitySelection token. 
+   * Serialized FamilyActivitySelection token.
    * Mutually exclusive with familyActivitySelectionId.
    */
   familyActivitySelection?: string | null;
   /**
-   * ID of a stored FamilyActivitySelection. 
+   * ID of a stored FamilyActivitySelection.
    * Mutually exclusive with familyActivitySelection.
    * Uses getFamilyActivitySelectionById() to retrieve the stored selection.
    */

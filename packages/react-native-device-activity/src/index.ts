@@ -2,8 +2,8 @@ import { EventEmitter, EventSubscription } from "expo-modules-core";
 import { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
-import DeviceActivitySelectionView from "./DeviceActivitySelectionView";
 import DeviceActivityReportView from "./DeviceActivityReport";
+import DeviceActivitySelectionView from "./DeviceActivitySelectionView";
 import DeviceActivitySelectionViewPersisted from "./DeviceActivitySelectionViewPersisted";
 import {
   Action,
@@ -350,29 +350,38 @@ export const getFamilyActivitySelectionId = (id: string) => {
  * @param selectionId The ID of the stored selection
  * @returns The stored selection string or null if not found
  */
-export const useDeviceActivityReportWithId = (selectionId: string): string | null => {
+export const useDeviceActivityReportWithId = (
+  selectionId: string,
+): string | null => {
   const [selection, setSelection] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (!selectionId?.trim()) {
-      console.warn('useDeviceActivityReportWithId: selectionId is empty or undefined');
+      console.warn(
+        "useDeviceActivityReportWithId: selectionId is empty or undefined",
+      );
       setSelection(null);
       return;
     }
-    
+
     try {
       const storedSelection = getFamilyActivitySelectionId(selectionId.trim());
       setSelection(storedSelection || null);
-      
+
       if (!storedSelection) {
-        console.warn(`useDeviceActivityReportWithId: No stored selection found for ID '${selectionId}'`);
+        console.warn(
+          `useDeviceActivityReportWithId: No stored selection found for ID '${selectionId}'`,
+        );
       }
     } catch (error) {
-      console.error('useDeviceActivityReportWithId: Error retrieving selection:', error);
+      console.error(
+        "useDeviceActivityReportWithId: Error retrieving selection:",
+        error,
+      );
       setSelection(null);
     }
   }, [selectionId]);
-  
+
   return selection;
 };
 
