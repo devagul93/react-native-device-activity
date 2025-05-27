@@ -89,6 +89,6 @@ struct AppListView: View {
     AppUsageData(appName: "Instagram", duration: 3600),  // 1 hour
     AppUsageData(appName: "Safari", duration: 1800),  // 30 minutes
     AppUsageData(appName: "Messages", duration: 900),  // 15 minutes
-    AppUsageData(appName: "TikTok", duration: 2700),  // 45 minutes
+    AppUsageData(appName: "TikTok", duration: 2700)  // 45 minutes
   ])
 }

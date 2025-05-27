@@ -29,8 +29,7 @@ struct PickupsReport: DeviceActivityReportScene {
   let content: ([AppPickupData]) -> PickupsView
 
   func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async
-    -> [AppPickupData]
-  {
+    -> [AppPickupData] {
     // Extract app names and their pickup counts from the data
     // Note: The data is already filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView

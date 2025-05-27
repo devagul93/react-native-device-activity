@@ -27,7 +27,7 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
     PickupsReport { appPickupData in
       PickupsView(appPickupData: appPickupData)
     }
-    
+
     // Add more reports here...
   }
 }
