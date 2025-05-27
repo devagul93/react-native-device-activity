@@ -20,6 +20,7 @@ class DeviceActivityReportViewModelBase: ObservableObject {
   @Published var from = Date.distantPast
   @Published var to = Date.distantPast
   @Published var segmentation: String = "daily"
+  @Published var reportStyle: [String: Any]?
 
   init() {}
 }
@@ -95,6 +96,13 @@ struct DeviceActivityReportUI: View {
             // you can decide which kind of data to show - apps, categories, and/or web domains
         )
     )
+    .onAppear {
+      // Store reportStyle in UserDefaults so the extension can access it
+      if let reportStyle = model.reportStyle {
+        let contextKey = "reportStyle_\(model.context)"
+        userDefaults?.set(reportStyle, forKey: contextKey)
+      }
+    }
   }
 }
 

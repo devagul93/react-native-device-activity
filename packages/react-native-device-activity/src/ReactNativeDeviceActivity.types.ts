@@ -68,6 +68,53 @@ export enum DeviceActivityReportViewDevice {
   mac = 3,
 }
 
+export type DeviceActivityReportStyle = {
+  /**
+   * Text color for simple report contexts like "Total Pickups"
+   * Format: { red: 0-255, green: 0-255, blue: 0-255, alpha?: 0-1 }
+   */
+  textColor?: {
+    red: number;
+    green: number;
+    blue: number;
+    alpha?: number;
+  };
+  /**
+   * Font size for simple report contexts like "Total Pickups"
+   * Default: 48
+   */
+  fontSize?: number;
+  /**
+   * Font weight for simple report contexts like "Total Pickups"
+   * Options: "ultraLight", "thin", "light", "regular", "medium", "semibold", "bold", "heavy", "black"
+   * Default: "bold"
+   */
+  fontWeight?: "ultraLight" | "thin" | "light" | "regular" | "medium" | "semibold" | "bold" | "heavy" | "black";
+  /**
+   * Font design for simple report contexts like "Total Pickups"
+   * Options: "default", "rounded", "monospaced", "serif"
+   * Default: "rounded"
+   */
+  fontDesign?: "default" | "rounded" | "monospaced" | "serif";
+  /**
+   * Background color for the report view
+   * Set to null or { alpha: 0 } for transparent background
+   * Format: { red: 0-255, green: 0-255, blue: 0-255, alpha?: 0-1 }
+   */
+  backgroundColor?: {
+    red: number;
+    green: number;
+    blue: number;
+    alpha?: number;
+  } | null;
+  /**
+   * Text alignment for simple report contexts like "Total Pickups"
+   * Options: "leading", "center", "trailing"
+   * Default: "center"
+   */
+  textAlignment?: "leading" | "center" | "trailing";
+};
+
 export type DeviceActivityReportViewProps = PropsWithChildren<{
   style: StyleProp<ViewStyle>;
   /**
@@ -90,6 +137,11 @@ export type DeviceActivityReportViewProps = PropsWithChildren<{
   users?: "all" | "children" | null;
   // context for selecting which report to show (e.g., "Total Activity", "App List")
   context?: string;
+  /**
+   * Styling options for simple report contexts like "Total Pickups"
+   * Only applies to contexts that support custom styling
+   */
+  reportStyle?: DeviceActivityReportStyle;
 }>;
 
 /**

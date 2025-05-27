@@ -12,6 +12,8 @@ struct TotalActivityView: View {
 
   var body: some View {
     Text(totalActivity)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background(Color.clear)
   }
 }
 

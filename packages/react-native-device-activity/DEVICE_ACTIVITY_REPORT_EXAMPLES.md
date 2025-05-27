@@ -693,4 +693,171 @@ The pickup-related views are properly integrated into the Expo module system:
 3. **iOS Extension** - ✅ Both `PickupsReport` and `TotalPickupsReport` registered in `DeviceActivityReportUI`
 4. **React Native Export** - ✅ `DeviceActivityReportView` exported from main index
 
-Choose the context that best fits your UI and user experience needs. 
+Choose the context that best fits your UI and user experience needs.
+
+## Report Styling (iOS 16.0+)
+
+### Customizing Total Pickups Appearance
+
+The "Total Pickups" context supports custom styling through the `reportStyle` prop. This allows you to customize the appearance of the pickup count number to match your app's design.
+
+#### Basic Styling Example
+
+```tsx
+import { DeviceActivityReportView } from 'react-native-device-activity';
+
+function StyledTotalPickups() {
+  const today = new Date();
+  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+  return (
+    <View style={{ backgroundColor: '#f0f8ff', borderRadius: 12, padding: 20 }}>
+      <Text style={{ textAlign: 'center', marginBottom: 10 }}>Today's Pickups</Text>
+      <DeviceActivityReportView
+        style={{ height: 80 }}
+        context="Total Pickups"
+        familyActivitySelection={null}
+        from={startOfDay.getTime()}
+        to={endOfDay.getTime()}
+        segmentation="daily"
+        users="all"
+        devices={null}
+        reportStyle={{
+          textColor: { red: 255, green: 59, blue: 48, alpha: 1 },
+          fontSize: 64,
+          fontWeight: 'heavy',
+          fontDesign: 'rounded',
+          textAlignment: 'center',
+          // backgroundColor is transparent by default
+        }}
+      />
+    </View>
+  );
+}
+```
+
+#### Available Style Properties
+
+```typescript
+interface DeviceActivityReportStyle {
+  // Text color (RGB 0-255, alpha 0-1)
+  textColor?: {
+    red: number;
+    green: number;
+    blue: number;
+    alpha?: number;
+  };
+  
+  // Font size (default: 48)
+  fontSize?: number;
+  
+  // Font weight options
+  fontWeight?: 'ultraLight' | 'thin' | 'light' | 'regular' | 'medium' | 
+               'semibold' | 'bold' | 'heavy' | 'black';
+  
+  // Font design options
+  fontDesign?: 'default' | 'rounded' | 'monospaced' | 'serif';
+  
+  // Text alignment
+  textAlignment?: 'leading' | 'center' | 'trailing';
+  
+  // Background color (null for transparent)
+  backgroundColor?: {
+    red: number;
+    green: number;
+    blue: number;
+    alpha?: number;
+  } | null;
+}
+```
+
+#### Style Examples
+
+**Large Red Text:**
+```tsx
+<DeviceActivityReportView
+  context="Total Pickups"
+  reportStyle={{
+    textColor: { red: 255, green: 59, blue: 48 },
+    fontSize: 72,
+    fontWeight: 'heavy',
+    textAlignment: 'center'
+  }}
+/>
+```
+
+**Blue Monospaced Font:**
+```tsx
+<DeviceActivityReportView
+  context="Total Pickups"
+  reportStyle={{
+    textColor: { red: 0, green: 122, blue: 255, alpha: 0.8 },
+    fontSize: 56,
+    fontWeight: 'semibold',
+    fontDesign: 'monospaced',
+    textAlignment: 'center'
+  }}
+/>
+```
+
+**Custom Background Color:**
+```tsx
+<DeviceActivityReportView
+  context="Total Pickups"
+  reportStyle={{
+    textColor: { red: 255, green: 255, blue: 255 },
+    fontSize: 48,
+    fontWeight: 'bold',
+    backgroundColor: { red: 52, green: 199, blue: 89, alpha: 1 }
+  }}
+/>
+```
+
+**Transparent Background (Default):**
+```tsx
+// The background is transparent by default, allowing the container's background to show through
+<View style={{ backgroundColor: '#f0f8ff', borderRadius: 12 }}>
+  <DeviceActivityReportView
+    context="Total Pickups"
+    reportStyle={{
+      textColor: { red: 0, green: 0, blue: 0 },
+      fontSize: 48,
+      fontWeight: 'bold'
+      // No backgroundColor specified = transparent
+    }}
+  />
+</View>
+```
+
+#### Responsive Design
+
+You can create responsive designs by adjusting styles based on device characteristics:
+
+```tsx
+import { Dimensions } from 'react-native';
+
+function ResponsiveTotalPickups() {
+  const { width } = Dimensions.get('window');
+  const isTablet = width > 768;
+  
+  return (
+    <DeviceActivityReportView
+      context="Total Pickups"
+      reportStyle={{
+        fontSize: isTablet ? 80 : 56,
+        fontWeight: isTablet ? 'black' : 'bold',
+        textColor: { red: 52, green: 199, blue: 89 }
+      }}
+    />
+  );
+}
+```
+
+#### Notes
+
+- Styling only applies to the "Total Pickups" context
+- The background is transparent by default, allowing React Native container backgrounds to show through
+- Colors use RGB values from 0-255, with optional alpha from 0-1
+- Font sizes are in points (similar to CSS px)
+- Changes to `reportStyle` are passed to the DeviceActivityReport extension via UserDefaults 

@@ -965,6 +965,10 @@ public class DeviceActivityReportViewModule: Module {
           }
         }
       }
+
+      Prop("reportStyle") { (view: DeviceActivityReportView, prop: [String: Any]?) in
+        view.model.reportStyle = prop
+      }
     }
   }
 }
