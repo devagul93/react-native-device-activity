@@ -35,7 +35,7 @@ struct AppListView: View {
 
   private func formatDuration(_ duration: TimeInterval) -> String {
     let hours = Int(duration) / 3600
-    let minutes = Int(duration % 3600) / 60
+    let minutes = Int(duration.truncatingRemainder(dividingBy: 3600)) / 60
 
     if hours > 0 {
       return "\(hours)h:\(String(format: "%02d", minutes))m"
