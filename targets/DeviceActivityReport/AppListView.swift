@@ -6,10 +6,8 @@
 //
 
 import SwiftUI
-import FamilyControls
 
 struct AppIconView: View {
-  let token: ApplicationToken?
   let appName: String
   
   private func iconColor(for appName: String) -> Color {
@@ -19,8 +17,7 @@ struct AppIconView: View {
   }
   
   var body: some View {
-    // For now, create attractive placeholder icons since direct app icon extraction
-    // from ApplicationToken isn't straightforward in DeviceActivity extensions
+    // Create attractive placeholder icons with app's first letter
     RoundedRectangle(cornerRadius: 5)
       .fill(iconColor(for: appName))
       .frame(width: 24, height: 24)
@@ -77,7 +74,7 @@ struct AppListView: View {
           ForEach(Array(appUsageData.enumerated()), id: \.offset) { index, appData in
             HStack(spacing: 12) {
               // App icon
-              AppIconView(token: appData.appToken, appName: appData.appName)
+              AppIconView(appName: appData.appName)
               
               Text(appData.appName)
                 .font(.body)
