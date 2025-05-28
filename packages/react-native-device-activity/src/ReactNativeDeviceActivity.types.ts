@@ -89,7 +89,16 @@ export type DeviceActivityReportStyle = {
    * Options: "ultraLight", "thin", "light", "regular", "medium", "semibold", "bold", "heavy", "black"
    * Default: "bold"
    */
-  fontWeight?: "ultraLight" | "thin" | "light" | "regular" | "medium" | "semibold" | "bold" | "heavy" | "black";
+  fontWeight?:
+    | "ultraLight"
+    | "thin"
+    | "light"
+    | "regular"
+    | "medium"
+    | "semibold"
+    | "bold"
+    | "heavy"
+    | "black";
   /**
    * Font design for simple report contexts like "Total Pickups"
    * Options: "default", "rounded", "monospaced", "serif"

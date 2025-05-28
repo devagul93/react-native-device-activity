@@ -1,57 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { DeviceActivityReportView, DeviceActivityReportStyle } from 'react-native-device-activity';
+} from "react-native";
+import {
+  DeviceActivityReportView,
+  DeviceActivityReportStyle,
+} from "react-native-device-activity";
 
 export default function StyledTotalPickupsScreen() {
-  const [selectedStyle, setSelectedStyle] = useState<'default' | 'red' | 'blue' | 'large'>('default');
+  const [selectedStyle, setSelectedStyle] = useState<
+    "default" | "red" | "blue" | "large"
+  >("default");
 
   // Set date range for today
   const today = new Date();
-  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+  const startOfDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const endOfDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    23,
+    59,
+    59,
+  );
 
-  const styles: Record<string, { style?: DeviceActivityReportStyle; description: string; background: string }> = {
+  const styles: Record<
+    string,
+    {
+      style?: DeviceActivityReportStyle;
+      description: string;
+      background: string;
+    }
+  > = {
     default: {
-      description: 'Default styling with transparent background',
-      background: '#f0f8ff',
+      description: "Default styling with transparent background",
+      background: "#f0f8ff",
     },
     red: {
       style: {
         textColor: { red: 255, green: 59, blue: 48, alpha: 1 },
         fontSize: 64,
-        fontWeight: 'heavy',
-        textAlignment: 'center',
+        fontWeight: "heavy",
+        textAlignment: "center",
       },
-      description: 'Large red text, heavy weight',
-      background: '#fff5f5',
+      description: "Large red text, heavy weight",
+      background: "#fff5f5",
     },
     blue: {
       style: {
         textColor: { red: 0, green: 122, blue: 255, alpha: 1 },
         fontSize: 56,
-        fontWeight: 'semibold',
-        fontDesign: 'monospaced',
-        textAlignment: 'center',
+        fontWeight: "semibold",
+        fontDesign: "monospaced",
+        textAlignment: "center",
       },
-      description: 'Blue monospaced text, semibold',
-      background: '#f0f8ff',
+      description: "Blue monospaced text, semibold",
+      background: "#f0f8ff",
     },
     large: {
       style: {
         textColor: { red: 52, green: 199, blue: 89, alpha: 1 },
         fontSize: 80,
-        fontWeight: 'black',
-        fontDesign: 'rounded',
-        textAlignment: 'center',
+        fontWeight: "black",
+        fontDesign: "rounded",
+        textAlignment: "center",
       },
-      description: 'Extra large green text, black weight',
-      background: '#f0fff4',
+      description: "Extra large green text, black weight",
+      background: "#f0fff4",
     },
   };
 
@@ -89,7 +112,8 @@ export default function StyledTotalPickupsScreen() {
             <Text
               style={[
                 stylesSheet.styleButtonDescription,
-                selectedStyle === key && stylesSheet.styleButtonDescriptionActive,
+                selectedStyle === key &&
+                  stylesSheet.styleButtonDescriptionActive,
               ]}
             >
               {config.description}
@@ -100,7 +124,9 @@ export default function StyledTotalPickupsScreen() {
 
       {/* Current Style Info */}
       <View style={stylesSheet.infoContainer}>
-        <Text style={stylesSheet.infoTitle}>Current Style: {selectedStyle}</Text>
+        <Text style={stylesSheet.infoTitle}>
+          Current Style: {selectedStyle}
+        </Text>
         <Text style={stylesSheet.infoDescription}>
           {currentConfig.description}
         </Text>
@@ -110,20 +136,27 @@ export default function StyledTotalPickupsScreen() {
               Font Size: {currentConfig.style.fontSize || 48}
             </Text>
             <Text style={stylesSheet.styleDetailText}>
-              Font Weight: {currentConfig.style.fontWeight || 'bold'}
+              Font Weight: {currentConfig.style.fontWeight || "bold"}
             </Text>
             <Text style={stylesSheet.styleDetailText}>
-              Font Design: {currentConfig.style.fontDesign || 'rounded'}
+              Font Design: {currentConfig.style.fontDesign || "rounded"}
             </Text>
             <Text style={stylesSheet.styleDetailText}>
-              Text Color: RGB({currentConfig.style.textColor?.red || 'default'}, {currentConfig.style.textColor?.green || 'default'}, {currentConfig.style.textColor?.blue || 'default'})
+              Text Color: RGB({currentConfig.style.textColor?.red || "default"},{" "}
+              {currentConfig.style.textColor?.green || "default"},{" "}
+              {currentConfig.style.textColor?.blue || "default"})
             </Text>
           </View>
         )}
       </View>
 
       {/* Report View with Custom Background */}
-      <View style={[stylesSheet.reportContainer, { backgroundColor: currentConfig.background }]}>
+      <View
+        style={[
+          stylesSheet.reportContainer,
+          { backgroundColor: currentConfig.background },
+        ]}
+      >
         <Text style={stylesSheet.reportLabel}>Total Pickups Today:</Text>
         <DeviceActivityReportView
           style={stylesSheet.reportView}
@@ -141,22 +174,40 @@ export default function StyledTotalPickupsScreen() {
       {/* Styling Guide */}
       <View style={stylesSheet.guideContainer}>
         <Text style={stylesSheet.guideTitle}>Styling Guide</Text>
-        
+
         <View style={stylesSheet.guideSection}>
-          <Text style={stylesSheet.guideSectionTitle}>Available Properties:</Text>
-          <Text style={stylesSheet.guideText}>• textColor: RGB color (0-255) with optional alpha</Text>
-          <Text style={stylesSheet.guideText}>• fontSize: Number (default: 48)</Text>
-          <Text style={stylesSheet.guideText}>• fontWeight: ultraLight, thin, light, regular, medium, semibold, bold, heavy, black</Text>
-          <Text style={stylesSheet.guideText}>• fontDesign: default, rounded, monospaced, serif</Text>
-          <Text style={stylesSheet.guideText}>• textAlignment: leading, center, trailing</Text>
-          <Text style={stylesSheet.guideText}>• backgroundColor: RGB color or null for transparent</Text>
+          <Text style={stylesSheet.guideSectionTitle}>
+            Available Properties:
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • textColor: RGB color (0-255) with optional alpha
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • fontSize: Number (default: 48)
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • fontWeight: ultraLight, thin, light, regular, medium, semibold,
+            bold, heavy, black
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • fontDesign: default, rounded, monospaced, serif
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • textAlignment: leading, center, trailing
+          </Text>
+          <Text style={stylesSheet.guideText}>
+            • backgroundColor: RGB color or null for transparent
+          </Text>
         </View>
 
         <View style={stylesSheet.guideSection}>
-          <Text style={stylesSheet.guideSectionTitle}>Transparent Background:</Text>
+          <Text style={stylesSheet.guideSectionTitle}>
+            Transparent Background:
+          </Text>
           <Text style={stylesSheet.guideText}>
-            By default, the background is transparent (Color.clear) so it inherits the React Native view's background color.
-            This allows you to set any background color on the container view.
+            By default, the background is transparent (Color.clear) so it
+            inherits the React Native view's background color. This allows you
+            to set any background color on the container view.
           </Text>
         </View>
 
@@ -164,7 +215,7 @@ export default function StyledTotalPickupsScreen() {
           <Text style={stylesSheet.guideSectionTitle}>Example Usage:</Text>
           <View style={stylesSheet.codeContainer}>
             <Text style={stylesSheet.codeText}>
-{`<DeviceActivityReportView
+              {`<DeviceActivityReportView
   context="Total Pickups"
   reportStyle={{
     textColor: { red: 255, green: 59, blue: 48 },
@@ -185,7 +236,7 @@ export default function StyledTotalPickupsScreen() {
 const stylesSheet = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
     padding: 20,
@@ -193,13 +244,13 @@ const stylesSheet = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    fontWeight: "bold",
+    color: "#1a1a1a",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   styleContainer: {
     marginHorizontal: 20,
@@ -207,56 +258,56 @@ const stylesSheet = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 12,
   },
   styleButton: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   styleButtonActive: {
-    borderColor: '#007AFF',
-    backgroundColor: '#f0f8ff',
+    borderColor: "#007AFF",
+    backgroundColor: "#f0f8ff",
   },
   styleButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 4,
   },
   styleButtonTextActive: {
-    color: '#007AFF',
+    color: "#007AFF",
   },
   styleButtonDescription: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   styleButtonDescriptionActive: {
-    color: '#0056b3',
+    color: "#0056b3",
   },
   infoContainer: {
     marginHorizontal: 20,
     marginBottom: 20,
     padding: 16,
-    backgroundColor: '#e7f3ff',
+    backgroundColor: "#e7f3ff",
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: "#007AFF",
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#0056b3',
+    fontWeight: "600",
+    color: "#0056b3",
     marginBottom: 4,
   },
   infoDescription: {
     fontSize: 14,
-    color: '#0056b3',
+    color: "#0056b3",
     marginBottom: 8,
   },
   styleDetails: {
@@ -264,7 +315,7 @@ const stylesSheet = StyleSheet.create({
   },
   styleDetailText: {
     fontSize: 12,
-    color: '#0056b3',
+    color: "#0056b3",
     marginBottom: 2,
   },
   reportContainer: {
@@ -272,7 +323,7 @@ const stylesSheet = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -283,9 +334,9 @@ const stylesSheet = StyleSheet.create({
   },
   reportLabel: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#1a1a1a",
+    textAlign: "center",
     marginBottom: 16,
   },
   reportView: {
@@ -296,13 +347,13 @@ const stylesSheet = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 40,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
   },
   guideTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 16,
   },
   guideSection: {
@@ -310,26 +361,26 @@ const stylesSheet = StyleSheet.create({
   },
   guideSectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 8,
   },
   guideText: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
     marginBottom: 4,
     lineHeight: 20,
   },
   codeContainer: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     borderRadius: 8,
     padding: 12,
     marginTop: 8,
   },
   codeText: {
     fontSize: 12,
-    fontFamily: 'monospace',
-    color: '#495057',
+    fontFamily: "monospace",
+    color: "#495057",
     lineHeight: 16,
   },
-}); 
+});

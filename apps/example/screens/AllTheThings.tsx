@@ -20,8 +20,8 @@ import {
   UIBlurEffectStyle,
 } from "react-native-device-activity";
 
-import { ActivityPickerPersisted } from "../components/ActivityPicker";
 import ContextTestScreen from "./ContextTestScreen";
+import { ActivityPickerPersisted } from "../components/ActivityPicker";
 
 // const initialMinutes = 1;
 // const postponeMinutes = 60;
@@ -258,7 +258,7 @@ export function AllTheThings() {
             Alert.alert(
               "Context Test",
               "This would navigate to the ContextTestScreen to test all DeviceActivityReport contexts (Total Activity, App List, Pickups, Total Pickups)",
-              [{ text: "OK" }]
+              [{ text: "OK" }],
             );
           }}
         />

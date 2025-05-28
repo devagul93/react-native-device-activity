@@ -1,45 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { DeviceActivityReportView } from 'react-native-device-activity';
+} from "react-native";
+import { DeviceActivityReportView } from "react-native-device-activity";
 
-type ContextType = 'Total Activity' | 'App List' | 'Pickups' | 'Total Pickups';
+type ContextType = "Total Activity" | "App List" | "Pickups" | "Total Pickups";
 
 export default function ContextTestScreen() {
-  const [selectedContext, setSelectedContext] = useState<ContextType>('Total Activity');
+  const [selectedContext, setSelectedContext] =
+    useState<ContextType>("Total Activity");
 
-  const contexts: { name: ContextType; description: string; iosVersion: string }[] = [
+  const contexts: {
+    name: ContextType;
+    description: string;
+    iosVersion: string;
+  }[] = [
     {
-      name: 'Total Activity',
-      description: 'Shows total usage duration across all apps',
-      iosVersion: '15.0+',
+      name: "Total Activity",
+      description: "Shows total usage duration across all apps",
+      iosVersion: "15.0+",
     },
     {
-      name: 'App List',
-      description: 'Shows detailed list of apps with usage times',
-      iosVersion: '15.0+',
+      name: "App List",
+      description: "Shows detailed list of apps with usage times",
+      iosVersion: "15.0+",
     },
     {
-      name: 'Pickups',
-      description: 'Shows detailed list of apps with pickup counts',
-      iosVersion: '16.0+',
+      name: "Pickups",
+      description: "Shows detailed list of apps with pickup counts",
+      iosVersion: "16.0+",
     },
     {
-      name: 'Total Pickups',
-      description: 'Shows simple total pickup count',
-      iosVersion: '16.0+',
+      name: "Total Pickups",
+      description: "Shows simple total pickup count",
+      iosVersion: "16.0+",
     },
   ];
 
   // Set date range for today
   const today = new Date();
-  const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+  const startOfDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const endOfDay = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    23,
+    59,
+    59,
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -66,7 +82,8 @@ export default function ContextTestScreen() {
               <Text
                 style={[
                   styles.contextButtonText,
-                  selectedContext === context.name && styles.contextButtonTextActive,
+                  selectedContext === context.name &&
+                    styles.contextButtonTextActive,
                 ]}
               >
                 {context.name}
@@ -74,7 +91,8 @@ export default function ContextTestScreen() {
               <Text
                 style={[
                   styles.contextButtonDescription,
-                  selectedContext === context.name && styles.contextButtonDescriptionActive,
+                  selectedContext === context.name &&
+                    styles.contextButtonDescriptionActive,
                 ]}
               >
                 {context.description}
@@ -82,7 +100,8 @@ export default function ContextTestScreen() {
               <Text
                 style={[
                   styles.contextButtonVersion,
-                  selectedContext === context.name && styles.contextButtonVersionActive,
+                  selectedContext === context.name &&
+                    styles.contextButtonVersionActive,
                 ]}
               >
                 iOS {context.iosVersion}
@@ -96,7 +115,7 @@ export default function ContextTestScreen() {
       <View style={styles.infoContainer}>
         <Text style={styles.infoTitle}>Current Context: {selectedContext}</Text>
         <Text style={styles.infoDescription}>
-          {contexts.find(c => c.name === selectedContext)?.description}
+          {contexts.find((c) => c.name === selectedContext)?.description}
         </Text>
       </View>
 
@@ -141,7 +160,7 @@ export default function ContextTestScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
     padding: 20,
@@ -149,13 +168,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    fontWeight: "bold",
+    color: "#1a1a1a",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6c757d',
+    color: "#6c757d",
   },
   contextContainer: {
     marginHorizontal: 20,
@@ -163,75 +182,75 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 12,
   },
   contextButton: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
     borderWidth: 2,
-    borderColor: '#e9ecef',
+    borderColor: "#e9ecef",
   },
   contextButtonActive: {
-    borderColor: '#007AFF',
-    backgroundColor: '#f0f8ff',
+    borderColor: "#007AFF",
+    backgroundColor: "#f0f8ff",
   },
   contextButtonContent: {
     flex: 1,
   },
   contextButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 4,
   },
   contextButtonTextActive: {
-    color: '#007AFF',
+    color: "#007AFF",
   },
   contextButtonDescription: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
     marginBottom: 4,
   },
   contextButtonDescriptionActive: {
-    color: '#0056b3',
+    color: "#0056b3",
   },
   contextButtonVersion: {
     fontSize: 12,
-    color: '#adb5bd',
-    fontWeight: '500',
+    color: "#adb5bd",
+    fontWeight: "500",
   },
   contextButtonVersionActive: {
-    color: '#007AFF',
+    color: "#007AFF",
   },
   infoContainer: {
     marginHorizontal: 20,
     marginBottom: 20,
     padding: 16,
-    backgroundColor: '#e7f3ff',
+    backgroundColor: "#e7f3ff",
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+    borderLeftColor: "#007AFF",
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#0056b3',
+    fontWeight: "600",
+    color: "#0056b3",
     marginBottom: 4,
   },
   infoDescription: {
     fontSize: 14,
-    color: '#0056b3',
+    color: "#0056b3",
   },
   reportContainer: {
     marginHorizontal: 20,
     marginBottom: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -248,29 +267,29 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 40,
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
   },
   statusTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontWeight: "600",
+    color: "#1a1a1a",
     marginBottom: 12,
   },
   statusItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 8,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   statusLabel: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#28a745',
+    fontWeight: "500",
+    color: "#28a745",
     minWidth: 140,
   },
   statusValue: {
     fontSize: 14,
-    color: '#6c757d',
+    color: "#6c757d",
     flex: 1,
   },
-}); 
+});
