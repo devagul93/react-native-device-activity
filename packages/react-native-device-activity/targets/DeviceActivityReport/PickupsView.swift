@@ -143,7 +143,7 @@ struct PickupsView_Previews: PreviewProvider {
     PickupsView(appPickupData: [
       AppPickupData(appName: "Instagram", numberOfPickups: 25, totalDuration: 3600),
       AppPickupData(appName: "Messages", numberOfPickups: 18, totalDuration: 1800),
-      AppPickupData(appName: "Safari", numberOfPickups: 12, totalDuration: 2400)
+      AppPickupData(appName: "Safari", numberOfPickups: 12, totalDuration: 2400),
     ])
   }
 }

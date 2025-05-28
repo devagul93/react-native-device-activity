@@ -9,13 +9,13 @@ import SwiftUI
 
 struct AppIconView: View {
   let appName: String
-  
+
   private func iconColor(for appName: String) -> Color {
     let colors: [Color] = [.blue, .green, .orange, .red, .purple, .pink, .indigo, .teal]
     let index = abs(appName.hashValue) % colors.count
     return colors[index]
   }
-  
+
   var body: some View {
     // Create attractive placeholder icons with app's first letter
     RoundedRectangle(cornerRadius: 5)
@@ -36,7 +36,7 @@ struct AppListView: View {
   private func formatDuration(_ duration: TimeInterval) -> String {
     let hours = Int(duration) / 3600
     let minutes = Int(duration % 3600) / 60
-    
+
     if hours > 0 {
       return "\(hours)h:\(String(format: "%02d", minutes))m"
     } else {
@@ -52,9 +52,9 @@ struct AppListView: View {
           .font(.subheadline)
           .fontWeight(.medium)
           .foregroundColor(.secondary)
-        
+
         Spacer()
-        
+
         Text("AVG TIME")
           .font(.subheadline)
           .fontWeight(.medium)
@@ -63,7 +63,7 @@ struct AppListView: View {
       .padding(.horizontal, 16)
       .padding(.top, 16)
       .padding(.bottom, 8)
-      
+
       if appUsageData.isEmpty {
         Text("No app usage data")
           .font(.subheadline)
@@ -75,28 +75,28 @@ struct AppListView: View {
             HStack(spacing: 12) {
               // App icon
               AppIconView(appName: appData.appName)
-              
+
               Text(appData.appName)
                 .font(.body)
                 .foregroundColor(.primary)
-              
+
               Spacer()
-              
+
               Text(formatDuration(appData.duration))
                 .font(.body)
                 .foregroundColor(.primary)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            
+
             if index < appUsageData.count - 1 {
               Divider()
-                .padding(.leading, 52) // Align with text, not icon
+                .padding(.leading, 52)  // Align with text, not icon
             }
           }
         }
       }
-      
+
       Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -110,6 +110,6 @@ struct AppListView: View {
     AppUsageData(appName: "Instagram", duration: 3600),  // 1 hour
     AppUsageData(appName: "Safari", duration: 1800),  // 30 minutes
     AppUsageData(appName: "Messages", duration: 900),  // 15 minutes
-    AppUsageData(appName: "TikTok", duration: 2700)  // 45 minutes
+    AppUsageData(appName: "TikTok", duration: 2700),  // 45 minutes
   ])
 }

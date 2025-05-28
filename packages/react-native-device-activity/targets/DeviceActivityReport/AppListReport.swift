@@ -25,7 +25,8 @@ struct AppListReport: DeviceActivityReportScene {
   let content: ([AppUsageData]) -> AppListView
 
   func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async
-    -> [AppUsageData] {
+    -> [AppUsageData]
+  {
     // Extract app names and their usage times from the data
     // The data is filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView
@@ -39,19 +40,20 @@ struct AppListReport: DeviceActivityReportScene {
         for await categoryActivity in activitySegment.categories {
           // Process applications within each category
           for await applicationActivity in categoryActivity.applications {
-            let appName = applicationActivity.application.localizedDisplayName ?? 
-                         applicationActivity.application.bundleIdentifier ?? "Unknown App"
+            let appName =
+              applicationActivity.application.localizedDisplayName ?? applicationActivity
+              .application.bundleIdentifier ?? "Unknown App"
             let duration = applicationActivity.totalActivityDuration
 
             // Accumulate duration for each app (in case same app appears multiple times)
             appUsageMap[appName, default: 0] += duration
           }
-          
+
           // Also check for web domains if any
           for await webDomainActivity in categoryActivity.webDomains {
             let domainName = webDomainActivity.webDomain.domain ?? "Unknown Website"
             let duration = webDomainActivity.totalActivityDuration
-            
+
             // Accumulate duration for each web domain
             appUsageMap[domainName, default: 0] += duration
           }

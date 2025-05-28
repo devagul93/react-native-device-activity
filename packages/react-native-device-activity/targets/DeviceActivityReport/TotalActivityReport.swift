@@ -20,7 +20,8 @@ struct TotalActivityReport: DeviceActivityReportScene {
   let content: (String) -> TotalActivityView
 
   func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async
-    -> String {
+    -> String
+  {
     // Reformat the data into a configuration that can be used to create
     // the report's view.
     let formatter = DateComponentsFormatter()
