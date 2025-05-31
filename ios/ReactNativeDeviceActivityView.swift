@@ -28,6 +28,7 @@ class ReactNativeDeviceActivityView: ExpoView {
 
     contentView.view.backgroundColor = .clear
     contentView.view.isUserInteractionEnabled = false
+    contentView.overrideUserInterfaceStyle = .dark
 
     self.addSubview(contentView.view)
 
@@ -62,7 +63,7 @@ class ReactNativeDeviceActivityView: ExpoView {
       "familyActivitySelection": (isSelectionEmpty ? nil : familyActivitySelectionString) as Any,
       "applicationCount": selection.applicationTokens.count,
       "categoryCount": selection.categoryTokens.count,
-      "webDomainCount": selection.webDomainTokens.count,
+      "webDomainCount": selection.webDomainTokens.count
     ])
   }
 }

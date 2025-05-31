@@ -39,12 +39,14 @@ struct ActivityPicker: View {
       )
       .allowsHitTesting(false)
       .background(Color.clear)
+      .preferredColorScheme(.dark)
     } else {
       FamilyActivityPicker(
         selection: $model.activitySelection
       )
       .allowsHitTesting(false)
       .background(Color.clear)
+      .preferredColorScheme(.dark)
     }
   }
 }
