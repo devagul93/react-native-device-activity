@@ -100,7 +100,8 @@ struct AppListView: View {
       Spacer()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .background(Color(.systemBackground))
+    .background(Color.clear)
+    .preferredColorScheme(.dark)
   }
 }
 

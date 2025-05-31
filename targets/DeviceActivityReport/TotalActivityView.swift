@@ -14,6 +14,7 @@ struct TotalActivityView: View {
     Text(totalActivity)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.clear)
+      .preferredColorScheme(.dark)
   }
 }
 

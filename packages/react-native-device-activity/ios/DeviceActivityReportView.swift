@@ -99,7 +99,8 @@ struct DeviceActivityReportFallbackUI: View {
         .padding()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(.systemBackground))
+    .background(Color.clear)
+    .preferredColorScheme(.dark)
   }
 }
 
@@ -107,6 +108,7 @@ struct DeviceActivityReportFallbackUI: View {
 @available(iOS 16.0, *)
 struct DeviceActivityReportUI: View {
   @ObservedObject var model: DeviceActivityReportViewModel
+  @Environment(\.colorScheme) var colorScheme
 
   var body: some View {
     DeviceActivityReport(
@@ -130,6 +132,8 @@ struct DeviceActivityReportUI: View {
             // you can decide which kind of data to show - apps, categories, and/or web domains
         )
     )
+    .preferredColorScheme(.dark) // Force dark mode
+    .background(Color.clear) // Make background transparent
     .onAppear {
       // Store reportStyle in UserDefaults so the extension can access it
       if let reportStyle = model.reportStyle {
@@ -167,6 +171,9 @@ class DeviceActivityReportView: ExpoView {
     super.init(appContext: appContext)
 
     clipsToBounds = true
+    contentView.view.backgroundColor = .clear
+    contentView.view.isOpaque = false
+    contentView.overrideUserInterfaceStyle = .dark
     self.addSubview(contentView.view)
   }
 

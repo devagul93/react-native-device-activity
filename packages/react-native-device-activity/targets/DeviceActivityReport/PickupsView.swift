@@ -59,7 +59,7 @@ struct PickupsView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray6).opacity(0.5))
         .cornerRadius(8)
         .padding(.horizontal)
 
@@ -78,7 +78,8 @@ struct PickupsView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .background(Color(.systemBackground))
+    .background(Color.clear)
+    .preferredColorScheme(.dark)
   }
 }
 
@@ -132,7 +133,7 @@ struct PickupRowView: View {
     }
     .padding(.vertical, 8)
     .padding(.horizontal, 12)
-    .background(Color(.systemGray6))
+    .background(Color(.systemGray6).opacity(0.3))
     .cornerRadius(8)
   }
 }

@@ -24,6 +24,7 @@ struct TotalPickupsView: View {
       // .multilineTextAlignment(getTextAlignment())
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.clear)
+      .preferredColorScheme(.dark)
   }
 
   // private func getFont() -> Font {
