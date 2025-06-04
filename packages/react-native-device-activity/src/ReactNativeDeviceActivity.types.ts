@@ -560,6 +560,14 @@ export type ReactNativeDeviceActivityNativeModule = {
   isShieldActive: () => boolean;
   getEvents: (onlyEventsForActivityWithName?: string) => EventsLookup;
   activities: () => string[];
+
+  // cached data functions
+  getCachedAppUsageData: () => Promise<{
+    data: Array<{ appName: string; duration: number }>;
+    timestamp: number;
+    isStale: boolean;
+  } | null>;
+  clearCachedAppUsageData: () => Promise<void>;
 } & EventEmitter<EventListenerMap>;
 
 export type OnAuthorizationStatusChange = ({

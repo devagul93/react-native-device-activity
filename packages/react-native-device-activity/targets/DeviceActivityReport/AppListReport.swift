@@ -16,9 +16,69 @@ extension DeviceActivityReport.Context {
   static let appList = DeviceActivityReport.Context("App List")
 }
 
-struct AppUsageData {
+struct AppUsageData: Equatable {
   let appName: String
   let duration: TimeInterval
+  
+  static func == (lhs: AppUsageData, rhs: AppUsageData) -> Bool {
+    return lhs.appName == rhs.appName && abs(lhs.duration - rhs.duration) < 1.0
+  }
+}
+
+// MARK: - Shared Cache Constants
+private let DEVICE_ACTIVITY_CACHE_KEY = "cached_app_usage_data"
+private let CACHE_TIMESTAMP_KEY = "cached_app_usage_timestamp"
+private let CACHE_SELECTION_ID_KEY = "cached_selection_id"
+private let CACHE_TIME_RANGE_KEY = "cached_time_range"
+
+// MARK: - Cache Helper Functions
+private func generateCacheKey(selectionId: String?, timeRange: String) -> String {
+  let selection = selectionId ?? "all_apps"
+  return "\(DEVICE_ACTIVITY_CACHE_KEY)_\(selection)_\(timeRange)"
+}
+
+private func cacheAppUsageData(_ data: [AppUsageData], selectionId: String?, timeRange: String) {
+  guard let userDefaults = userDefaults else { return }
+  
+  let cacheKey = generateCacheKey(selectionId: selectionId, timeRange: timeRange)
+  
+  // Convert to serializable format
+  let cacheData = data.map { app in
+    [
+      "appName": app.appName,
+      "duration": app.duration
+    ]
+  }
+  
+  // Store cached data
+  userDefaults.set(cacheData, forKey: cacheKey)
+  userDefaults.set(Date().timeIntervalSince1970, forKey: "\(cacheKey)_timestamp")
+  userDefaults.set(selectionId ?? "", forKey: "\(cacheKey)_selection")
+  
+  // Also store as "latest" for immediate access
+  userDefaults.set(cacheData, forKey: "latest_app_usage_data")
+  userDefaults.set(Date().timeIntervalSince1970, forKey: "latest_app_usage_timestamp")
+  
+  appListLogger.log("💾 Extension: Cached \(data.count) apps to shared storage (key: \(cacheKey))")
+}
+
+private func getCachedAppUsageData(selectionId: String?, timeRange: String) -> ([AppUsageData], Date?)? {
+  guard let userDefaults = userDefaults else { return nil }
+  
+  let cacheKey = generateCacheKey(selectionId: selectionId, timeRange: timeRange)
+  
+  guard let cacheData = userDefaults.array(forKey: cacheKey) as? [[String: Any]],
+        let timestamp = userDefaults.object(forKey: "\(cacheKey)_timestamp") as? TimeInterval else {
+    return nil
+  }
+  
+  let appUsageData = cacheData.compactMap { dict -> AppUsageData? in
+    guard let appName = dict["appName"] as? String,
+          let duration = dict["duration"] as? TimeInterval else { return nil }
+    return AppUsageData(appName: appName, duration: duration)
+  }
+  
+  return (appUsageData, Date(timeIntervalSince1970: timestamp))
 }
 
 struct AppListReport: DeviceActivityReportScene {
@@ -34,6 +94,41 @@ struct AppListReport: DeviceActivityReportScene {
     appListLogger.log("🔍 AppListReport: Starting data processing for 'App List' context...")
     let startTime = Date()
 
+    // Generate cache identifiers
+    let timeRange = "current" // You could make this more specific based on actual time range
+    let selectionId = userDefaults?.string(forKey: "current_selection_id") // Store this when setting selection
+    
+    // Check for cached data first
+    if let (cachedData, cacheTimestamp) = getCachedAppUsageData(selectionId: selectionId, timeRange: timeRange) {
+      let cacheAge = Date().timeIntervalSince(cacheTimestamp)
+      
+      // Return cached data if less than 30 seconds old
+      if cacheAge < 30 && !cachedData.isEmpty {
+        appListLogger.log("⚡ AppListReport: Returning cached data (age: \(cacheAge)s, count: \(cachedData.count))")
+        
+        // Process fresh data in background
+        Task {
+          let freshData = await processFreshData(data: data, startTime: startTime)
+          if freshData.count != cachedData.count || freshData != cachedData {
+            cacheAppUsageData(freshData, selectionId: selectionId, timeRange: timeRange)
+            appListLogger.log("🔄 AppListReport: Updated cache with fresh data (\(freshData.count) apps)")
+          }
+        }
+        
+        return cachedData
+      }
+    }
+
+    // Process fresh data
+    let freshData = await processFreshData(data: data, startTime: startTime)
+    
+    // Cache the fresh data
+    cacheAppUsageData(freshData, selectionId: selectionId, timeRange: timeRange)
+    
+    return freshData
+  }
+  
+  private func processFreshData(data: DeviceActivityResults<DeviceActivityData>, startTime: Date) async -> [AppUsageData] {
     // Extract app names and their usage times from the data
     // The data is filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView

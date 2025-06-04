@@ -32,6 +32,11 @@ const warnFnString = () => {
   return "";
 };
 
+const warnFnCacheData = () => {
+  console.warn(warnText);
+  return Promise.resolve(null);
+};
+
 const warnFnActivitySelectionWithMetadata = () => {
   console.warn(warnText);
 
@@ -101,6 +106,8 @@ const mockModule: ReactNativeDeviceActivityNativeModule | null = {
   removeAllListeners: warnFnAddListener,
   emit: warnFnAddListener,
   listenerCount: warnFnNumber,
+  getCachedAppUsageData: warnFnCacheData,
+  clearCachedAppUsageData: warnFn,
 };
 
 export default mockModule;

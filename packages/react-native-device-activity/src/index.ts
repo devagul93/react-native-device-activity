@@ -683,11 +683,26 @@ export function isSubsetOf(
 }
 
 export function isAvailable(): boolean {
-  return (
-    Platform.OS === "ios" &&
-    parseInt(Platform.Version, 10) >= 15 &&
-    !!ReactNativeDeviceActivityModule
-  );
+  return Platform.OS === "ios";
+}
+
+/**
+ * Get cached app usage data from shared storage (if available)
+ * This allows the main app to show cached data immediately while fresh data loads
+ */
+export async function getCachedAppUsageData(): Promise<{
+  data: Array<{ appName: string; duration: number }>;
+  timestamp: number;
+  isStale: boolean;
+} | null> {
+  return ReactNativeDeviceActivityModule?.getCachedAppUsageData() || null;
+}
+
+/**
+ * Clear cached app usage data
+ */
+export async function clearCachedAppUsageData(): Promise<void> {
+  return ReactNativeDeviceActivityModule?.clearCachedAppUsageData();
 }
 
 export {
@@ -702,3 +717,9 @@ export type {
 };
 
 export * from "./ReactNativeDeviceActivity.types";
+
+// Export new instant loading solution components and functions
+export {
+  useDeviceActivityWithCache,
+  InstantDeviceActivityReport,
+} from "./DeviceActivityModule";

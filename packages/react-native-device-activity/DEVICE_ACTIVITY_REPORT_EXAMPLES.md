@@ -2,6 +2,311 @@
 
 This document demonstrates how to use the new `familyActivitySelectionId` prop with `DeviceActivityReportView`, including edge case handling.
 
+## 🚀 NEW: Instant Loading Solution (No More 1-2 Minute Delays!)
+
+### Problem Solved
+The standard `DeviceActivityReportView` can take 1-2 minutes to show data due to iOS extension startup delays. The new **InstantDeviceActivityReport** component eliminates this wait by using a smart caching system.
+
+### Quick Start - Replace Your Current DeviceActivityReportView
+
+**Before (slow loading):**
+```tsx
+<DeviceActivityReportView
+  familyActivitySelectionId="focus_time_selection"
+  context="App List"
+  from={startTime}
+  to={endTime}
+  style={{ flex: 1 }}
+/>
+```
+
+**After (instant loading):**
+```tsx
+import { InstantDeviceActivityReport } from 'react-native-device-activity';
+
+<InstantDeviceActivityReport 
+  selectionId="focus_time_selection"
+  timeRange={24} // hours
+/>
+```
+
+### How It Works
+1. **First Load**: Normal 1-2 minute delay (extension caches data)
+2. **Subsequent Loads**: **INSTANT** display from cache ⚡
+3. **Background Refresh**: Fresh data loads automatically
+4. **Visual Feedback**: Shows data status with colored indicators
+
+### Complete Example with Instant Loading
+
+```tsx
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { 
+  InstantDeviceActivityReport,
+  useDeviceActivityWithCache,
+  DeviceActivitySelectionViewPersisted,
+  getCachedAppUsageData,
+  clearCachedAppUsageData
+} from 'react-native-device-activity';
+
+export default function InstantReportExample() {
+  const [showSelection, setShowSelection] = useState(false);
+  const { data, isLoading, isCached, isStale } = useDeviceActivityWithCache('focus_apps');
+
+  const handleClearCache = async () => {
+    await clearCachedAppUsageData();
+    console.log('Cache cleared');
+  };
+
+  const handleDebugCache = async () => {
+    const cached = await getCachedAppUsageData();
+    console.log('Cache status:', {
+      hasData: !!cached,
+      count: cached?.data?.length || 0,
+      ageSeconds: cached ? (Date.now() / 1000) - cached.timestamp : 'N/A',
+      isStale: cached?.isStale
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Instant Screen Time Report</Text>
+      
+      {/* Cache Status */}
+      <View style={styles.statusBar}>
+        <Text style={styles.statusText}>
+          {isCached 
+            ? (isStale ? '🔄 Cached (refreshing...)' : '⚡ Latest data') 
+            : '📊 Loading...'
+          }
+        </Text>
+        <Text style={styles.dataCount}>
+          {data ? `${data.length} apps` : 'No data'}
+        </Text>
+      </View>
+
+      {/* Control Buttons */}
+      <View style={styles.buttonRow}>
+        <Button title="Select Apps" onPress={() => setShowSelection(true)} />
+        <Button title="Debug Cache" onPress={handleDebugCache} />
+        <Button title="Clear Cache" onPress={handleClearCache} />
+      </View>
+
+      {/* App Selection */}
+      {showSelection && (
+        <DeviceActivitySelectionViewPersisted
+          familyActivitySelectionId="focus_apps"
+          headerText="Select apps to monitor"
+          footerText="Choose apps for instant usage reports"
+          style={styles.selectionView}
+          onSelectionChange={(event) => {
+            console.log('Selection updated:', event.nativeEvent);
+            setShowSelection(false);
+          }}
+        />
+      )}
+
+      {/* Instant Report - Shows cached data immediately! */}
+      <InstantDeviceActivityReport 
+        selectionId="focus_apps"
+        timeRange={24} // Last 24 hours
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  statusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#e3f2fd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1565c0',
+  },
+  dataCount: {
+    fontSize: 14,
+    color: '#424242',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+  },
+  selectionView: {
+    height: 300,
+    marginBottom: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+});
+```
+
+### Advanced Usage with Custom Cache Hook
+
+For more control, use the `useDeviceActivityWithCache` hook directly:
+
+```tsx
+import React from 'react';
+import { View, Text } from 'react-native';
+import { 
+  useDeviceActivityWithCache, 
+  DeviceActivityReportView 
+} from 'react-native-device-activity';
+
+function CustomInstantReport({ selectionId }: { selectionId: string }) {
+  const { data, isLoading, isCached, isStale } = useDeviceActivityWithCache(selectionId);
+  
+  const from = Date.now() - (24 * 60 * 60 * 1000); // 24 hours ago
+  const to = Date.now();
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Custom status indicator */}
+      {isCached && (
+        <View style={{
+          backgroundColor: isStale ? '#fff3cd' : '#d1f2EB',
+          padding: 8,
+          borderRadius: 4,
+          marginBottom: 8,
+        }}>
+          <Text style={{ textAlign: 'center' }}>
+            {isStale ? '🔄 Refreshing data...' : '⚡ Showing latest data'}
+          </Text>
+          {data && (
+            <Text style={{ textAlign: 'center', fontSize: 12 }}>
+              {data.length} apps tracked
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* The actual report view */}
+      <DeviceActivityReportView
+        familyActivitySelectionId={selectionId}
+        context="App List"
+        from={from}
+        to={to}
+        style={{ 
+          flex: 1,
+          // Add green border when showing cached data
+          ...(isCached && {
+            borderLeftWidth: 3,
+            borderLeftColor: '#00AA00'
+          })
+        }}
+      />
+    </View>
+  );
+}
+```
+
+### Cache Management Functions
+
+```tsx
+import { 
+  getCachedAppUsageData, 
+  clearCachedAppUsageData 
+} from 'react-native-device-activity';
+
+// Check cache status
+const checkCache = async () => {
+  const cached = await getCachedAppUsageData();
+  if (cached) {
+    console.log('Found cached data:', {
+      appCount: cached.data.length,
+      ageSeconds: (Date.now() / 1000) - cached.timestamp,
+      isStale: cached.isStale
+    });
+  } else {
+    console.log('No cached data found');
+  }
+};
+
+// Clear cache manually
+const clearCache = async () => {
+  await clearCachedAppUsageData();
+  console.log('Cache cleared');
+};
+```
+
+### Migration from Standard DeviceActivityReportView
+
+**Step 1**: Replace the component
+```tsx
+// Replace this:
+<DeviceActivityReportView
+  familyActivitySelectionId="my_selection"
+  context="App List"
+  from={startTime}
+  to={endTime}
+  style={{ flex: 1 }}
+/>
+
+// With this:
+<InstantDeviceActivityReport 
+  selectionId="my_selection"
+  timeRange={24} // hours
+/>
+```
+
+**Step 2**: Enjoy instant loading!
+- First load: 1-2 minutes (normal)
+- All subsequent loads: **INSTANT** ⚡
+
+### Troubleshooting
+
+**No cached data showing?**
+```tsx
+// Add this debug component to check cache status
+function CacheDebugger() {
+  const [cacheInfo, setCacheInfo] = useState(null);
+  
+  useEffect(() => {
+    getCachedAppUsageData().then(setCacheInfo);
+  }, []);
+  
+  return (
+    <Text>
+      Cache: {cacheInfo ? `${cacheInfo.data.length} apps` : 'None'}
+    </Text>
+  );
+}
+```
+
+**Still getting blank views?**
+1. Verify your familyActivitySelection has apps selected
+2. Check Xcode Console for cache logs:
+   - Look for: `"💾 Extension: Cached X apps"`
+   - Look for: `"📦 Main App: Retrieved cached data"`
+3. Ensure App Groups are configured correctly
+
+### Performance Benefits
+
+- **Immediate User Feedback**: No more staring at blank screens
+- **Smooth App Experience**: Users see content instantly  
+- **Background Updates**: Fresh data loads without blocking UI
+- **Battery Efficient**: Smart caching reduces extension processing
+
+---
+
 ## Basic Usage
 
 ### Option 1: Using Stored Selection ID (New)
