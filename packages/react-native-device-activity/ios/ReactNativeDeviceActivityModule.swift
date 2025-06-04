@@ -878,26 +878,26 @@ public class ReactNativeDeviceActivityModule: Module {
 
       }
     }
-
-    // MARK: - ManagedSettings Enhancement
-    @objc func getCurrentShieldedApps() -> [String] {
-      let shield = store.shield
-      let shieldedApps = shield.applications ?? Set()
-      
-      // Convert ApplicationTokens to app names (this gives us immediate app list)
-      let appNames = shieldedApps.compactMap { token in
-        Application(token: token).localizedDisplayName ?? Application(token: token).bundleIdentifier
-      }
-      
-      logger.log("🛡️ ManagedSettings: Found \(appNames.count) currently shielded apps")
-      return appNames
-    }
   }
 
   @objc func activities() -> [String] {
     return center.activities.map { activity in
       activity.rawValue
     }
+  }
+
+  // MARK: - ManagedSettings Enhancement
+  @objc func getCurrentShieldedApps() -> [String] {
+    let shield = store.shield
+    let shieldedApps = shield.applications ?? Set()
+    
+    // Convert ApplicationTokens to app names (this gives us immediate app list)
+    let appNames = shieldedApps.compactMap { token in
+      Application(token: token).localizedDisplayName ?? Application(token: token).bundleIdentifier
+    }
+    
+    logger.log("🛡️ ManagedSettings: Found \(appNames.count) currently shielded apps")
+    return appNames
   }
 }
 
