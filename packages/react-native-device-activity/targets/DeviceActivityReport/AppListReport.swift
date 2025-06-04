@@ -10,7 +10,8 @@ import SwiftUI
 import os
 
 // Create logger for AppListReport
-private let appListLogger = Logger(subsystem: "ReactNativeDeviceActivity", category: "AppListReport")
+private let appListLogger = Logger(
+  subsystem: "ReactNativeDeviceActivity", category: "AppListReport")
 
 extension DeviceActivityReport.Context {
   static let appList = DeviceActivityReport.Context("App List")
@@ -19,7 +20,7 @@ extension DeviceActivityReport.Context {
 struct AppUsageData: Equatable {
   let appName: String
   let duration: TimeInterval
-  
+
   static func == (lhs: AppUsageData, rhs: AppUsageData) -> Bool {
     return lhs.appName == rhs.appName && abs(lhs.duration - rhs.duration) < 1.0
   }
@@ -39,45 +40,49 @@ private func generateCacheKey(selectionId: String?, timeRange: String) -> String
 
 private func cacheAppUsageData(_ data: [AppUsageData], selectionId: String?, timeRange: String) {
   guard let userDefaults = userDefaults else { return }
-  
+
   let cacheKey = generateCacheKey(selectionId: selectionId, timeRange: timeRange)
-  
+
   // Convert to serializable format
   let cacheData = data.map { app in
     [
       "appName": app.appName,
-      "duration": app.duration
+      "duration": app.duration,
     ]
   }
-  
+
   // Store cached data
   userDefaults.set(cacheData, forKey: cacheKey)
   userDefaults.set(Date().timeIntervalSince1970, forKey: "\(cacheKey)_timestamp")
   userDefaults.set(selectionId ?? "", forKey: "\(cacheKey)_selection")
-  
+
   // Also store as "latest" for immediate access
   userDefaults.set(cacheData, forKey: "latest_app_usage_data")
   userDefaults.set(Date().timeIntervalSince1970, forKey: "latest_app_usage_timestamp")
-  
+
   appListLogger.log("💾 Extension: Cached \(data.count) apps to shared storage (key: \(cacheKey))")
 }
 
-private func getCachedAppUsageData(selectionId: String?, timeRange: String) -> ([AppUsageData], Date?)? {
+private func getCachedAppUsageData(selectionId: String?, timeRange: String) -> (
+  [AppUsageData], Date?
+)? {
   guard let userDefaults = userDefaults else { return nil }
-  
+
   let cacheKey = generateCacheKey(selectionId: selectionId, timeRange: timeRange)
-  
+
   guard let cacheData = userDefaults.array(forKey: cacheKey) as? [[String: Any]],
-        let timestamp = userDefaults.object(forKey: "\(cacheKey)_timestamp") as? TimeInterval else {
+    let timestamp = userDefaults.object(forKey: "\(cacheKey)_timestamp") as? TimeInterval
+  else {
     return nil
   }
-  
+
   let appUsageData = cacheData.compactMap { dict -> AppUsageData? in
     guard let appName = dict["appName"] as? String,
-          let duration = dict["duration"] as? TimeInterval else { return nil }
+      let duration = dict["duration"] as? TimeInterval
+    else { return nil }
     return AppUsageData(appName: appName, duration: duration)
   }
-  
+
   return (appUsageData, Date(timeIntervalSince1970: timestamp))
 }
 
@@ -95,41 +100,47 @@ struct AppListReport: DeviceActivityReportScene {
     let startTime = Date()
 
     // Generate cache identifiers
-    let timeRange = "current" // You could make this more specific based on actual time range
-    let selectionId = userDefaults?.string(forKey: "current_selection_id") // Store this when setting selection
-    
+    let timeRange = "current"  // You could make this more specific based on actual time range
+    let selectionId = userDefaults?.string(forKey: "current_selection_id")  // Store this when setting selection
+
     // Check for cached data first
-    if let (cachedData, cacheTimestamp) = getCachedAppUsageData(selectionId: selectionId, timeRange: timeRange),
-       let timestamp = cacheTimestamp {
+    if let (cachedData, cacheTimestamp) = getCachedAppUsageData(
+      selectionId: selectionId, timeRange: timeRange),
+      let timestamp = cacheTimestamp
+    {
       let cacheAge = Date().timeIntervalSince(timestamp)
-      
+
       // Return cached data if less than 30 seconds old
       if cacheAge < 30 && !cachedData.isEmpty {
-        appListLogger.log("⚡ AppListReport: Returning cached data (age: \(cacheAge)s, count: \(cachedData.count))")
-        
+        appListLogger.log(
+          "⚡ AppListReport: Returning cached data (age: \(cacheAge)s, count: \(cachedData.count))")
+
         // Process fresh data in background
         Task {
           let freshData = await processFreshData(data: data, startTime: startTime)
           if freshData.count != cachedData.count || freshData != cachedData {
             cacheAppUsageData(freshData, selectionId: selectionId, timeRange: timeRange)
-            appListLogger.log("🔄 AppListReport: Updated cache with fresh data (\(freshData.count) apps)")
+            appListLogger.log(
+              "🔄 AppListReport: Updated cache with fresh data (\(freshData.count) apps)")
           }
         }
-        
+
         return cachedData
       }
     }
 
     // Process fresh data
     let freshData = await processFreshData(data: data, startTime: startTime)
-    
+
     // Cache the fresh data
     cacheAppUsageData(freshData, selectionId: selectionId, timeRange: timeRange)
-    
+
     return freshData
   }
-  
-  private func processFreshData(data: DeviceActivityResults<DeviceActivityData>, startTime: Date) async -> [AppUsageData] {
+
+  private func processFreshData(data: DeviceActivityResults<DeviceActivityData>, startTime: Date)
+    async -> [AppUsageData]
+  {
     // Extract app names and their usage times from the data
     // The data is filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView
@@ -147,18 +158,22 @@ struct AppListReport: DeviceActivityReportScene {
       for await dataPoint in data {
         totalDataPoints += 1
         appListLogger.log("📊 AppListReport: Processing data point \(totalDataPoints)")
-        
+
         do {
           for await activitySegment in dataPoint.activitySegments {
             totalActivitySegments += 1
-            appListLogger.log("📈 AppListReport: Processing activity segment \(totalActivitySegments) from data point \(totalDataPoints)")
-            
+            appListLogger.log(
+              "📈 AppListReport: Processing activity segment \(totalActivitySegments) from data point \(totalDataPoints)"
+            )
+
             // Process categories within each segment
             do {
               for await categoryActivity in activitySegment.categories {
                 totalCategories += 1
-                appListLogger.log("📂 AppListReport: Processing category \(totalCategories) in segment \(totalActivitySegments)")
-                
+                appListLogger.log(
+                  "📂 AppListReport: Processing category \(totalCategories) in segment \(totalActivitySegments)"
+                )
+
                 // Process applications within each category
                 do {
                   for await applicationActivity in categoryActivity.applications {
@@ -168,14 +183,18 @@ struct AppListReport: DeviceActivityReportScene {
                       .application.bundleIdentifier ?? "Unknown App"
                     let duration = applicationActivity.totalActivityDuration
 
-                    appListLogger.log("📱 AppListReport: Found app '\(appName)' with duration \(duration)s (\(duration/60) min)")
+                    appListLogger.log(
+                      "📱 AppListReport: Found app '\(appName)' with duration \(duration)s (\(duration/60) min)"
+                    )
 
                     // Accumulate duration for each app (in case same app appears multiple times)
                     appUsageMap[appName, default: 0] += duration
                   }
                 } catch {
                   processingErrors += 1
-                  appListLogger.log("❌ AppListReport: Error processing applications in category \(totalCategories): \(String(describing: error))")
+                  appListLogger.log(
+                    "❌ AppListReport: Error processing applications in category \(totalCategories): \(String(describing: error))"
+                  )
                 }
 
                 // Also check for web domains if any
@@ -185,33 +204,42 @@ struct AppListReport: DeviceActivityReportScene {
                     let domainName = webDomainActivity.webDomain.domain ?? "Unknown Website"
                     let duration = webDomainActivity.totalActivityDuration
 
-                    appListLogger.log("🌐 AppListReport: Found web domain '\(domainName)' with duration \(duration)s (\(duration/60) min)")
+                    appListLogger.log(
+                      "🌐 AppListReport: Found web domain '\(domainName)' with duration \(duration)s (\(duration/60) min)"
+                    )
 
                     // Accumulate duration for each web domain
                     appUsageMap[domainName, default: 0] += duration
                   }
                 } catch {
                   processingErrors += 1
-                  appListLogger.log("❌ AppListReport: Error processing web domains in category \(totalCategories): \(String(describing: error))")
+                  appListLogger.log(
+                    "❌ AppListReport: Error processing web domains in category \(totalCategories): \(String(describing: error))"
+                  )
                 }
               }
             } catch {
               processingErrors += 1
-              appListLogger.log("❌ AppListReport: Error processing categories in segment \(totalActivitySegments): \(String(describing: error))")
+              appListLogger.log(
+                "❌ AppListReport: Error processing categories in segment \(totalActivitySegments): \(String(describing: error))"
+              )
             }
           }
         } catch {
           processingErrors += 1
-          appListLogger.log("❌ AppListReport: Error processing activity segments in data point \(totalDataPoints): \(String(describing: error))")
+          appListLogger.log(
+            "❌ AppListReport: Error processing activity segments in data point \(totalDataPoints): \(String(describing: error))"
+          )
         }
       }
     } catch {
       processingErrors += 1
-      appListLogger.log("❌ AppListReport: Error iterating through data points: \(String(describing: error))")
+      appListLogger.log(
+        "❌ AppListReport: Error iterating through data points: \(String(describing: error))")
     }
 
     let processingTime = Date().timeIntervalSince(startTime)
-    
+
     appListLogger.log("📋 AppListReport: Data processing complete:")
     appListLogger.log("   ⏱️ Processing time: \(processingTime) seconds")
     appListLogger.log("   📊 Data points: \(totalDataPoints)")
@@ -245,7 +273,7 @@ struct AppListReport: DeviceActivityReportScene {
     }.sorted { $0.duration > $1.duration }
 
     appListLogger.log("✅ AppListReport: Returning \(appUsageData.count) app usage entries to view")
-    
+
     if appUsageData.isEmpty {
       appListLogger.log("🚨 AppListReport: RETURNING EMPTY ARRAY - VIEW WILL BE BLANK!")
     }

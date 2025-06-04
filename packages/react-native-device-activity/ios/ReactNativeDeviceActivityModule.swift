@@ -787,6 +787,64 @@ public class ReactNativeDeviceActivityModule: Module {
       }
     }
 
+    // MARK: - Cache Functions
+    AsyncFunction("getCachedAppUsageData") { () -> [String: Any]? in
+      guard let userDefaults = userDefaults else {
+        return nil
+      }
+      
+      // Try to get latest cached data
+      if let cacheData = userDefaults.array(forKey: "latest_app_usage_data") as? [[String: Any]],
+         let timestamp = userDefaults.object(forKey: "latest_app_usage_timestamp") as? TimeInterval {
+        
+        let appUsageData = cacheData.compactMap { dict -> [String: Any]? in
+          guard let appName = dict["appName"] as? String,
+                let duration = dict["duration"] as? TimeInterval else { return nil }
+          return [
+            "appName": appName,
+            "duration": duration
+          ]
+        }
+        
+        let cacheAge = Date().timeIntervalSince1970 - timestamp
+        let isStale = cacheAge > 60 // Consider stale after 1 minute
+        
+        let result: [String: Any] = [
+          "data": appUsageData,
+          "timestamp": timestamp,
+          "isStale": isStale
+        ]
+        
+        logger.log("📦 Main App: Retrieved cached data (\(appUsageData.count) apps, age: \(cacheAge)s)")
+        return result
+      } else {
+        logger.log("📦 Main App: No cached data found")
+        return nil
+      }
+    }
+
+    AsyncFunction("clearCachedAppUsageData") { () -> Void in
+      guard let userDefaults = userDefaults else {
+        return
+      }
+      
+      // Clear all cache keys
+      let cacheKeys = ["latest_app_usage_data", "latest_app_usage_timestamp"]
+      for key in cacheKeys {
+        userDefaults.removeObject(forKey: key)
+      }
+      
+      // Also clear specific cache entries (could be multiple for different selections/time ranges)
+      let allKeys = userDefaults.dictionaryRepresentation().keys
+      for key in allKeys {
+        if key.hasPrefix("cached_app_usage_data") {
+          userDefaults.removeObject(forKey: key)
+        }
+      }
+      
+      logger.log("🗑️ Main App: Cleared all cached app usage data")
+    }
+
     Events(
       "onSelectionChange",
       "onDeviceActivityMonitorEvent",
@@ -820,91 +878,26 @@ public class ReactNativeDeviceActivityModule: Module {
 
       }
     }
+
+    // MARK: - ManagedSettings Enhancement
+    @objc func getCurrentShieldedApps() -> [String] {
+      let shield = store.shield
+      let shieldedApps = shield.applications ?? Set()
+      
+      // Convert ApplicationTokens to app names (this gives us immediate app list)
+      let appNames = shieldedApps.compactMap { token in
+        Application(token: token).localizedDisplayName ?? Application(token: token).bundleIdentifier
+      }
+      
+      logger.log("🛡️ ManagedSettings: Found \(appNames.count) currently shielded apps")
+      return appNames
+    }
   }
 
   @objc func activities() -> [String] {
     return center.activities.map { activity in
       activity.rawValue
     }
-  }
-
-  // MARK: - Cache Functions
-  @objc func getCachedAppUsageData() -> Promise {
-    return Promise { promise in
-      guard let userDefaults = userDefaults else {
-        promise.resolve(nil)
-        return
-      }
-      
-      // Try to get latest cached data
-      if let cacheData = userDefaults.array(forKey: "latest_app_usage_data") as? [[String: Any]],
-         let timestamp = userDefaults.object(forKey: "latest_app_usage_timestamp") as? TimeInterval {
-        
-        let appUsageData = cacheData.compactMap { dict -> [String: Any]? in
-          guard let appName = dict["appName"] as? String,
-                let duration = dict["duration"] as? TimeInterval else { return nil }
-          return [
-            "appName": appName,
-            "duration": duration
-          ]
-        }
-        
-        let cacheAge = Date().timeIntervalSince1970 - timestamp
-        let isStale = cacheAge > 60 // Consider stale after 1 minute
-        
-        let result: [String: Any] = [
-          "data": appUsageData,
-          "timestamp": timestamp,
-          "isStale": isStale
-        ]
-        
-        logger.log("📦 Main App: Retrieved cached data (\(appUsageData.count) apps, age: \(cacheAge)s)")
-        promise.resolve(result)
-      } else {
-        logger.log("📦 Main App: No cached data found")
-        promise.resolve(nil)
-      }
-    }
-  }
-
-  @objc func clearCachedAppUsageData() -> Promise {
-    return Promise { promise in
-      guard let userDefaults = userDefaults else {
-        promise.resolve(nil)
-        return
-      }
-      
-      // Clear all cache keys
-      let cacheKeys = ["latest_app_usage_data", "latest_app_usage_timestamp"]
-      for key in cacheKeys {
-        userDefaults.removeObject(forKey: key)
-      }
-      
-      // Also clear specific cache entries (could be multiple for different selections/time ranges)
-      let allKeys = userDefaults.dictionaryRepresentation().keys
-      for key in allKeys {
-        if key.hasPrefix("cached_app_usage_data") {
-          userDefaults.removeObject(forKey: key)
-        }
-      }
-      
-      logger.log("🗑️ Main App: Cleared all cached app usage data")
-      promise.resolve(nil)
-    }
-  }
-
-  // MARK: - ManagedSettings Enhancement
-  @objc func getCurrentShieldedApps() -> [String] {
-    let shield = store.shield
-    let shieldedApps = shield.applications ?? Set()
-    
-    // Convert ApplicationTokens to app names (this gives us immediate app list)
-    let appNames = shieldedApps.compactMap { token in
-      Application(token: token).localizedDisplayName ?? Application(token: token).bundleIdentifier
-    }
-    
-    logger.log("🛡️ ManagedSettings: Found \(appNames.count) currently shielded apps")
-    return appNames
   }
 }
 

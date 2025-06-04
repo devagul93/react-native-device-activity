@@ -9,7 +9,8 @@ import SwiftUI
 import os
 
 // Create logger for AppListView
-private let appListViewLogger = Logger(subsystem: "ReactNativeDeviceActivity", category: "AppListView")
+private let appListViewLogger = Logger(
+  subsystem: "ReactNativeDeviceActivity", category: "AppListView")
 
 struct AppIconView: View {
   let appName: String
@@ -51,13 +52,15 @@ struct AppListView: View {
 
   var body: some View {
     appListViewLogger.log("🎨 AppListView: Rendering with \(appUsageData.count) app usage entries")
-    
+
     if appUsageData.isEmpty {
-      appListViewLogger.log("⚠️ AppListView: Rendering EMPTY STATE - this will appear as blank or minimal content")
+      appListViewLogger.log(
+        "⚠️ AppListView: Rendering EMPTY STATE - this will appear as blank or minimal content")
     } else {
       appListViewLogger.log("✅ AppListView: Rendering with data:")
       for (index, appData) in appUsageData.enumerated() {
-        appListViewLogger.log("   \(index + 1). \(appData.appName): \(formatDuration(appData.duration))")
+        appListViewLogger.log(
+          "   \(index + 1). \(appData.appName): \(formatDuration(appData.duration))")
       }
     }
 
@@ -86,24 +89,24 @@ struct AppListView: View {
           Image(systemName: "app.badge")
             .font(.largeTitle)
             .foregroundColor(.secondary)
-          
+
           Text("No App Usage Data")
             .font(.headline)
             .fontWeight(.medium)
             .foregroundColor(.primary)
-          
+
           Text("No activity found for the selected apps in this time period.")
             .font(.subheadline)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 20)
-          
+
           Text("Possible reasons:")
             .font(.caption)
             .fontWeight(.medium)
             .foregroundColor(.secondary)
             .padding(.top, 8)
-          
+
           VStack(alignment: .leading, spacing: 4) {
             Text("• No apps selected for monitoring")
             Text("• Selected apps weren't used in this period")
@@ -146,7 +149,8 @@ struct AppListView: View {
           }
         }
         .onAppear {
-          appListViewLogger.log("👁️ AppListView: Data list view appeared with \(appUsageData.count) items")
+          appListViewLogger.log(
+            "👁️ AppListView: Data list view appeared with \(appUsageData.count) items")
         }
       }
 
@@ -157,7 +161,9 @@ struct AppListView: View {
     .preferredColorScheme(.dark)
     .onAppear {
       hasAppeared = true
-      appListViewLogger.log("👁️ AppListView: Main view appeared - hasData: \(!appUsageData.isEmpty), count: \(appUsageData.count)")
+      appListViewLogger.log(
+        "👁️ AppListView: Main view appeared - hasData: \(!appUsageData.isEmpty), count: \(appUsageData.count)"
+      )
     }
     .onDisappear {
       hasAppeared = false

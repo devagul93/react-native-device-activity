@@ -14,7 +14,8 @@ import SwiftUI
 import os
 
 // Create logger for DeviceActivityReportView
-private let reportLogger = Logger(subsystem: "ReactNativeDeviceActivity", category: "DeviceActivityReportView")
+private let reportLogger = Logger(
+  subsystem: "ReactNativeDeviceActivity", category: "DeviceActivityReportView")
 
 // Helper function to convert reportStyle to property list compatible format
 func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
@@ -55,7 +56,9 @@ func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
 class DeviceActivityReportViewModelBase: ObservableObject {
   @Published var familyActivitySelection = FamilyActivitySelection() {
     didSet {
-      reportLogger.log("📊 Model: familyActivitySelection changed - Apps: \(self.familyActivitySelection.applicationTokens.count), Categories: \(self.familyActivitySelection.categoryTokens.count), Domains: \(self.familyActivitySelection.webDomainTokens.count)")
+      reportLogger.log(
+        "📊 Model: familyActivitySelection changed - Apps: \(self.familyActivitySelection.applicationTokens.count), Categories: \(self.familyActivitySelection.categoryTokens.count), Domains: \(self.familyActivitySelection.webDomainTokens.count)"
+      )
     }
   }
   @Published var context = "Total Activity" {
@@ -90,7 +93,7 @@ class DeviceActivityReportViewModelBase: ObservableObject {
     let interval = to.timeIntervalSince(from)
     let hours = interval / 3600
     let days = interval / (3600 * 24)
-    
+
     if interval > 0 {
       reportLogger.log("📅 Model: Valid time range - Duration: \(hours) hours (\(days) days)")
       if interval < 3600 {
@@ -99,7 +102,8 @@ class DeviceActivityReportViewModelBase: ObservableObject {
     } else if interval == 0 {
       reportLogger.log("⚠️ Model: Zero time range - will definitely result in blank view")
     } else {
-      reportLogger.log("❌ Model: Invalid time range - 'to' is before 'from' - will result in blank view")
+      reportLogger.log(
+        "❌ Model: Invalid time range - 'to' is before 'from' - will result in blank view")
     }
   }
 
@@ -125,8 +129,10 @@ class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   // Computed property that converts to SegmentInterval
   var segment: DeviceActivityFilter.SegmentInterval {
     let interval = DateInterval(start: from, end: to)
-    
-    reportLogger.log("🔄 Model: Computing segment for interval from \(self.from) to \(self.to) with segmentation '\(self.segmentation)'")
+
+    reportLogger.log(
+      "🔄 Model: Computing segment for interval from \(self.from) to \(self.to) with segmentation '\(self.segmentation)'"
+    )
 
     if self.segmentation == "hourly" {
       reportLogger.log("✅ Model: Using hourly segmentation")
@@ -153,7 +159,7 @@ struct DeviceActivityReportFallbackUI: View {
 
   var body: some View {
     reportLogger.log("🎨 FallbackUI: Rendering fallback view for iOS 15.x")
-    
+
     return VStack {
       Text("Device Activity Reports")
         .font(.headline)
@@ -183,21 +189,24 @@ struct DeviceActivityReportUI: View {
   @State private var hasAppeared = false
 
   var body: some View {
-    reportLogger.log("🎨 ReportUI: Rendering DeviceActivityReport view for context '\(model.context)'")
-    
+    reportLogger.log(
+      "🎨 ReportUI: Rendering DeviceActivityReport view for context '\(model.context)'")
+
     let filter = createFilter()
-    reportLogger.log("🔍 ReportUI: Created filter - Apps: \(filter.applications.count), Categories: \(filter.categories.count), Domains: \(filter.webDomains.count)")
-    
+    reportLogger.log(
+      "🔍 ReportUI: Created filter - Apps: \(filter.applications.count), Categories: \(filter.categories.count), Domains: \(filter.webDomains.count)"
+    )
+
     return DeviceActivityReport(
       DeviceActivityReport.Context(rawValue: model.context),  // the context of your extension
       filter: filter
     )
-    .preferredColorScheme(.dark) // Force dark mode
-    .background(Color.clear) // Make background transparent
+    .preferredColorScheme(.dark)  // Force dark mode
+    .background(Color.clear)  // Make background transparent
     .onAppear {
       reportLogger.log("👁️ ReportUI: View appeared for context '\(model.context)'")
       hasAppeared = true
-      
+
       // Store reportStyle in UserDefaults so the extension can access it
       if let reportStyle = model.reportStyle {
         let contextKey = "reportStyle_\(model.context)"
@@ -206,7 +215,7 @@ struct DeviceActivityReportUI: View {
         userDefaults?.set(propertyListStyle, forKey: contextKey)
         reportLogger.log("💾 ReportUI: Stored reportStyle for context '\(model.context)'")
       }
-      
+
       // Log current state for debugging
       logCurrentState()
     }
@@ -233,10 +242,11 @@ struct DeviceActivityReportUI: View {
       }
     }
   }
-  
+
   private func createFilter() -> DeviceActivityFilter {
     if model.users != nil {
-      reportLogger.log("🔧 ReportUI: Creating filter with users: \(String(describing: model.users!))")
+      reportLogger.log(
+        "🔧 ReportUI: Creating filter with users: \(String(describing: model.users!))")
       return DeviceActivityFilter(
         segment: model.segment,
         users: model.users!,  // or .children
@@ -256,14 +266,15 @@ struct DeviceActivityReportUI: View {
       )
     }
   }
-  
+
   private func logCurrentState() {
-    let hasSelection = !model.familyActivitySelection.applicationTokens.isEmpty || 
-                      !model.familyActivitySelection.categoryTokens.isEmpty || 
-                      !model.familyActivitySelection.webDomainTokens.isEmpty
-    
+    let hasSelection =
+      !model.familyActivitySelection.applicationTokens.isEmpty
+      || !model.familyActivitySelection.categoryTokens.isEmpty
+      || !model.familyActivitySelection.webDomainTokens.isEmpty
+
     let timeInterval = model.to.timeIntervalSince(model.from)
-    
+
     reportLogger.log("🔍 ReportUI: Current State Summary:")
     reportLogger.log("   Context: '\(model.context)'")
     reportLogger.log("   Has Selection: \(hasSelection)")
@@ -273,16 +284,16 @@ struct DeviceActivityReportUI: View {
     reportLogger.log("   Time Range: \(model.from.description) to \(model.to.description)")
     reportLogger.log("   Duration Hours: \(timeInterval / 3600)")
     reportLogger.log("   Segmentation: '\(model.segmentation)'")
-    
+
     // Predict blank view scenarios
     if !hasSelection {
       reportLogger.log("⚠️ ReportUI: BLANK VIEW LIKELY - No apps, categories, or domains selected")
     }
-    
+
     if timeInterval <= 0 {
       reportLogger.log("⚠️ ReportUI: BLANK VIEW LIKELY - Invalid time range")
     }
-    
+
     if timeInterval < 3600 {
       reportLogger.log("⚠️ ReportUI: BLANK VIEW POSSIBLE - Very short time range")
     }
@@ -299,7 +310,7 @@ class DeviceActivityReportView: ExpoView {
 
   required init(appContext: AppContext? = nil) {
     reportLogger.log("🏗️ DeviceActivityReportView: Initializing...")
-    
+
     if #available(iOS 16.0, *) {
       reportLogger.log("✅ DeviceActivityReportView: Using iOS 16.0+ implementation")
       let viewModel = DeviceActivityReportViewModel()
@@ -322,13 +333,14 @@ class DeviceActivityReportView: ExpoView {
     contentView.view.isOpaque = false
     contentView.overrideUserInterfaceStyle = .dark
     self.addSubview(contentView.view)
-    
+
     reportLogger.log("✅ DeviceActivityReportView: Initialization complete")
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
     contentView.view.frame = bounds
-    reportLogger.log("📐 DeviceActivityReportView: Layout updated - bounds: \(String(describing: self.bounds))")
+    reportLogger.log(
+      "📐 DeviceActivityReportView: Layout updated - bounds: \(String(describing: self.bounds))")
   }
 }
