@@ -99,8 +99,9 @@ struct AppListReport: DeviceActivityReportScene {
     let selectionId = userDefaults?.string(forKey: "current_selection_id") // Store this when setting selection
     
     // Check for cached data first
-    if let (cachedData, cacheTimestamp) = getCachedAppUsageData(selectionId: selectionId, timeRange: timeRange) {
-      let cacheAge = Date().timeIntervalSince(cacheTimestamp)
+    if let (cachedData, cacheTimestamp) = getCachedAppUsageData(selectionId: selectionId, timeRange: timeRange),
+       let timestamp = cacheTimestamp {
+      let cacheAge = Date().timeIntervalSince(timestamp)
       
       // Return cached data if less than 30 seconds old
       if cacheAge < 30 && !cachedData.isEmpty {
