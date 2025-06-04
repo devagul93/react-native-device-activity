@@ -881,56 +881,93 @@ public class DeviceActivityReportViewModule: Module {
     View(DeviceActivityReportView.self) {
       // Defines props for the DeviceActivityReportView
       Prop("familyActivitySelection") { (view: DeviceActivityReportView, prop: String) in
+        logger.log("🔧 DeviceActivityReportView: Setting familyActivitySelection prop, length: \(prop.count)")
         let selection = deserializeFamilyActivitySelection(familyActivitySelectionStr: prop)
+        logger.log("🔧 DeviceActivityReportView: Deserialized selection - Apps: \(selection.applicationTokens.count), Categories: \(selection.categoryTokens.count), Domains: \(selection.webDomainTokens.count)")
         view.model.familyActivitySelection = selection
+        logger.log("✅ DeviceActivityReportView: familyActivitySelection prop set successfully")
       }
 
       // NEW: Handle familyActivitySelectionId prop with edge cases
       Prop("familyActivitySelectionId") { (view: DeviceActivityReportView, prop: String?) in
+        logger.log("🔧 DeviceActivityReportView: Setting familyActivitySelectionId prop: '\(prop ?? "nil")'")
+        
         guard let selectionId = prop,
           !selectionId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else {
           // Edge case: nil or empty/whitespace-only string - use empty selection
           logger.log(
-            "⚠️ DeviceActivityReportView: familyActivitySelectionId is nil or empty, using empty selection"
+            "⚠️ DeviceActivityReportView: familyActivitySelectionId is nil or empty, using empty selection. This may cause blank views."
           )
           view.model.familyActivitySelection = FamilyActivitySelection()
+          logger.log("✅ DeviceActivityReportView: Set empty familyActivitySelection due to nil/empty ID")
           return
         }
 
         let trimmedId = selectionId.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Log current state for debugging
+        let availableIds = getFamilyActivitySelectionIds().map { $0.id }
+        logger.log("🔍 DeviceActivityReportView: Looking for selection ID: '\(trimmedId)', Available IDs: \(availableIds)")
 
         if let storedSelection = getFamilyActivitySelectionById(id: trimmedId) {
           // Successfully retrieved stored selection
           view.model.familyActivitySelection = storedSelection
           logger.log(
-            "✅ DeviceActivityReportView: Successfully loaded selection for ID: \(trimmedId)")
+            "✅ DeviceActivityReportView: Successfully loaded selection for ID: \(trimmedId), Apps: \(storedSelection.applicationTokens.count), Categories: \(storedSelection.categoryTokens.count), Domains: \(storedSelection.webDomainTokens.count)")
         } else {
           // Edge case: Selection ID not found - log warning and use empty selection
           logger.log(
-            "⚠️ DeviceActivityReportView: No stored selection found for ID '\(trimmedId)'. Using empty selection. Available IDs: \(getFamilyActivitySelectionIds().map { $0.id })"
+            "⚠️ DeviceActivityReportView: No stored selection found for ID '\(trimmedId)'. Using empty selection. This will likely result in a blank view. Available IDs: \(availableIds)"
           )
           view.model.familyActivitySelection = FamilyActivitySelection()
+          logger.log("✅ DeviceActivityReportView: Set empty familyActivitySelection due to missing ID")
         }
       }
 
       Prop("context") { (view: DeviceActivityReportView, prop: String) in
+        logger.log("🔧 DeviceActivityReportView: Setting context prop: '\(prop)'")
         view.model.context = prop
+        logger.log("✅ DeviceActivityReportView: context prop set successfully")
       }
 
       Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in
+        logger.log("🔧 DeviceActivityReportView: Setting segmentation prop: '\(prop)'")
         view.model.segmentation = prop
+        logger.log("✅ DeviceActivityReportView: segmentation prop set successfully")
       }
 
       Prop("from") { (view: DeviceActivityReportView, prop: Double) in
-        view.model.from = Date(timeIntervalSince1970: prop / 1000)
+        let fromDate = Date(timeIntervalSince1970: prop / 1000)
+        logger.log("🔧 DeviceActivityReportView: Setting from prop: \(prop) -> \(fromDate)")
+        view.model.from = fromDate
+        logger.log("✅ DeviceActivityReportView: from prop set successfully")
       }
 
       Prop("to") { (view: DeviceActivityReportView, prop: Double) in
-        view.model.to = Date(timeIntervalSince1970: prop / 1000)
+        let toDate = Date(timeIntervalSince1970: prop / 1000)
+        logger.log("🔧 DeviceActivityReportView: Setting to prop: \(prop) -> \(toDate)")
+        view.model.to = toDate
+        
+        // Log time range validation
+        if let fromDate = view.model.from {
+          let timeInterval = toDate.timeIntervalSince(fromDate)
+          let hours = timeInterval / 3600
+          let days = timeInterval / (3600 * 24)
+          logger.log("📅 DeviceActivityReportView: Time range set - Duration: \(hours) hours (\(days) days)")
+          
+          if timeInterval <= 0 {
+            logger.log("⚠️ DeviceActivityReportView: Invalid time range - 'to' is not after 'from'")
+          } else if timeInterval < 3600 {
+            logger.log("⚠️ DeviceActivityReportView: Very short time range (< 1 hour) - may have insufficient data")
+          }
+        }
+        
+        logger.log("✅ DeviceActivityReportView: to prop set successfully")
       }
 
       Prop("devices") { (view: DeviceActivityReportView, prop: [Int]?) in
+        logger.log("🔧 DeviceActivityReportView: Setting devices prop: \(prop?.description ?? "nil")")
         if #available(iOS 16.0, *), let viewModel = view.model as? DeviceActivityReportViewModel {
           if let deviceInts = prop {
             let deviceModels = Set(
@@ -944,31 +981,44 @@ public class DeviceActivityReportViewModule: Module {
                 }
               })
             viewModel.devices = DeviceActivityFilter.Devices(deviceModels)
+            logger.log("✅ DeviceActivityReportView: devices prop set - \(deviceModels)")
           } else {
             viewModel.devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>())
+            logger.log("✅ DeviceActivityReportView: devices prop set to empty")
           }
+        } else {
+          logger.log("ℹ️ DeviceActivityReportView: devices prop ignored (iOS < 16.0 or incompatible model)")
         }
       }
 
       Prop("users") { (view: DeviceActivityReportView, prop: String?) in
+        logger.log("🔧 DeviceActivityReportView: Setting users prop: '\(prop ?? "nil")'")
         if #available(iOS 16.0, *), let viewModel = view.model as? DeviceActivityReportViewModel {
           if let userString = prop {
             switch userString {
             case "all":
               viewModel.users = .all
+              logger.log("✅ DeviceActivityReportView: users prop set to .all")
             case "children":
               viewModel.users = .children
+              logger.log("✅ DeviceActivityReportView: users prop set to .children")
             default:
               viewModel.users = .all
+              logger.log("✅ DeviceActivityReportView: users prop set to .all (default)")
             }
           } else {
             viewModel.users = .all
+            logger.log("✅ DeviceActivityReportView: users prop set to .all (nil)")
           }
+        } else {
+          logger.log("ℹ️ DeviceActivityReportView: users prop ignored (iOS < 16.0 or incompatible model)")
         }
       }
 
       Prop("reportStyle") { (view: DeviceActivityReportView, prop: [String: Any]?) in
+        logger.log("🔧 DeviceActivityReportView: Setting reportStyle prop: \(prop?.description ?? "nil")")
         view.model.reportStyle = prop
+        logger.log("✅ DeviceActivityReportView: reportStyle prop set successfully")
       }
     }
   }

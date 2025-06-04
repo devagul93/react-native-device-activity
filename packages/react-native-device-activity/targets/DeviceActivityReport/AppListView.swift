@@ -6,6 +6,10 @@
 //
 
 import SwiftUI
+import os
+
+// Create logger for AppListView
+private let appListViewLogger = Logger(subsystem: "ReactNativeDeviceActivity", category: "AppListView")
 
 struct AppIconView: View {
   let appName: String
@@ -32,6 +36,7 @@ struct AppIconView: View {
 
 struct AppListView: View {
   let appUsageData: [AppUsageData]
+  @State private var hasAppeared = false
 
   private func formatDuration(_ duration: TimeInterval) -> String {
     let hours = Int(duration) / 3600
@@ -45,7 +50,18 @@ struct AppListView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 0) {
+    appListViewLogger.log("🎨 AppListView: Rendering with \(appUsageData.count) app usage entries")
+    
+    if appUsageData.isEmpty {
+      appListViewLogger.log("⚠️ AppListView: Rendering EMPTY STATE - this will appear as blank or minimal content")
+    } else {
+      appListViewLogger.log("✅ AppListView: Rendering with data:")
+      for (index, appData) in appUsageData.enumerated() {
+        appListViewLogger.log("   \(index + 1). \(appData.appName): \(formatDuration(appData.duration))")
+      }
+    }
+
+    return VStack(alignment: .leading, spacing: 0) {
       // Header
       HStack {
         Text("BLOCKED APPS")
@@ -65,10 +81,44 @@ struct AppListView: View {
       .padding(.bottom, 8)
 
       if appUsageData.isEmpty {
-        Text("No app usage data")
-          .font(.subheadline)
+        // Enhanced empty state with better visibility
+        VStack(spacing: 12) {
+          Image(systemName: "app.badge")
+            .font(.largeTitle)
+            .foregroundColor(.secondary)
+          
+          Text("No App Usage Data")
+            .font(.headline)
+            .fontWeight(.medium)
+            .foregroundColor(.primary)
+          
+          Text("No activity found for the selected apps in this time period.")
+            .font(.subheadline)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 20)
+          
+          Text("Possible reasons:")
+            .font(.caption)
+            .fontWeight(.medium)
+            .foregroundColor(.secondary)
+            .padding(.top, 8)
+          
+          VStack(alignment: .leading, spacing: 4) {
+            Text("• No apps selected for monitoring")
+            Text("• Selected apps weren't used in this period")
+            Text("• Device Activity permissions not granted")
+            Text("• Time range too narrow")
+          }
+          .font(.caption)
           .foregroundColor(.secondary)
-          .padding()
+          .padding(.horizontal, 20)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .onAppear {
+          appListViewLogger.log("👁️ AppListView: Empty state view appeared")
+        }
       } else {
         VStack(spacing: 0) {
           ForEach(Array(appUsageData.enumerated()), id: \.offset) { index, appData in
@@ -95,6 +145,9 @@ struct AppListView: View {
             }
           }
         }
+        .onAppear {
+          appListViewLogger.log("👁️ AppListView: Data list view appeared with \(appUsageData.count) items")
+        }
       }
 
       Spacer()
@@ -102,6 +155,14 @@ struct AppListView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .background(Color.clear)
     .preferredColorScheme(.dark)
+    .onAppear {
+      hasAppeared = true
+      appListViewLogger.log("👁️ AppListView: Main view appeared - hasData: \(!appUsageData.isEmpty), count: \(appUsageData.count)")
+    }
+    .onDisappear {
+      hasAppeared = false
+      appListViewLogger.log("👁️ AppListView: Main view disappeared")
+    }
   }
 }
 
