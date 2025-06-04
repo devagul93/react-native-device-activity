@@ -329,6 +329,6 @@ class DeviceActivityReportView: ExpoView {
   override func layoutSubviews() {
     super.layoutSubviews()
     contentView.view.frame = bounds
-    reportLogger.log("📐 DeviceActivityReportView: Layout updated - bounds: \(bounds)")
+    reportLogger.log("📐 DeviceActivityReportView: Layout updated - bounds: \(NSStringFromCGRect(bounds))")
   }
 }
