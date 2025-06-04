@@ -236,7 +236,7 @@ struct DeviceActivityReportUI: View {
   
   private func createFilter() -> DeviceActivityFilter {
     if model.users != nil {
-      reportLogger.log("🔧 ReportUI: Creating filter with users: \(model.users!)")
+      reportLogger.log("🔧 ReportUI: Creating filter with users: \(String(describing: model.users!))")
       return DeviceActivityFilter(
         segment: model.segment,
         users: model.users!,  // or .children
