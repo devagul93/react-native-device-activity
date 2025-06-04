@@ -113,8 +113,7 @@ class DeviceActivityReportViewModelBase: ObservableObject {
 class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   @Published var devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>()) {
     didSet {
-      let deviceCount = self.devices.debugDescription.count
-      reportLogger.log("📊 Model: devices changed - count: \(deviceCount)")
+      reportLogger.log("📊 Model: devices changed")
     }
   }
   @Published var users: DeviceActivityFilter.Users? = .all {
@@ -127,7 +126,7 @@ class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   var segment: DeviceActivityFilter.SegmentInterval {
     let interval = DateInterval(start: from, end: to)
     
-    reportLogger.log("🔄 Model: Computing segment for interval \(interval) with segmentation '\(segmentation)'")
+    reportLogger.log("🔄 Model: Computing segment for interval \(interval) with segmentation '\(self.segmentation)'")
 
     if self.segmentation == "hourly" {
       reportLogger.log("✅ Model: Using hourly segmentation")
