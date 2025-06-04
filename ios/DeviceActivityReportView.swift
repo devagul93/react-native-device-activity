@@ -113,12 +113,13 @@ class DeviceActivityReportViewModelBase: ObservableObject {
 class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   @Published var devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>()) {
     didSet {
-      reportLogger.log("📊 Model: devices changed - \(self.devices)")
+      let deviceCount = self.devices.debugDescription.count
+      reportLogger.log("📊 Model: devices changed - count: \(deviceCount)")
     }
   }
   @Published var users: DeviceActivityFilter.Users? = .all {
     didSet {
-      reportLogger.log("📊 Model: users changed to \(self.users?.debugDescription ?? "nil")")
+      reportLogger.log("📊 Model: users changed to \(String(describing: self.users))")
     }
   }
 
