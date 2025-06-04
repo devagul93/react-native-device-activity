@@ -13,6 +13,103 @@ console.log(`
 🔍 DeviceActivityReport Debug Log Analysis
 ==========================================
 
+🚨 CRITICAL ISSUE DETECTED: INFINITE RENDER LOOP + EMPTY SELECTION
+===================================================================
+
+Your logs show TWO critical issues:
+
+1. ✅ INFINITE RENDER LOOP - FIXED
+   - Problem: useEffect with no dependency array calling setState
+   - Status: Fixed in DeviceActivityReport.ios.tsx
+
+2. ❌ EMPTY SELECTION DATA - NEEDS DEBUGGING
+   - Selection ID: "focus_time_selection" ✅ (valid)
+   - Selection Data: hasFamilyActivitySelection: false ❌ (empty)
+   - Selection Length: familyActivitySelectionLength: 0 ❌ (no apps)
+
+🔧 IMMEDIATE DEBUG STEPS FOR EMPTY SELECTION:
+============================================
+
+STEP 1: Check Storage in React
+-----------------------------
+Add this to your component to check what's actually stored:
+
+\`\`\`javascript
+import { getFamilyActivitySelectionId } from 'react-native-device-activity';
+
+// Add this in your component
+useEffect(() => {
+  console.log('🔍 Checking storage for focus_time_selection...');
+  const stored = getFamilyActivitySelectionId('focus_time_selection');
+  console.log('📦 Stored selection:', stored);
+  console.log('📏 Stored selection length:', stored?.length || 0);
+  console.log('📊 Is stored selection valid:', !!stored && stored.length > 0);
+}, []);
+\`\`\`
+
+STEP 2: Check Xcode Console (Missing from your logs)
+---------------------------------------------------
+Your logs are missing Swift module logs. Open Xcode and look for:
+
+✅ Success Pattern:
+"✅ DeviceActivityReportView: Successfully loaded selection for ID: focus_time_selection, Apps: [N], Categories: [N], Domains: [N]"
+
+❌ Failure Pattern:
+"⚠️ DeviceActivityReportView: No stored selection found for ID 'focus_time_selection'. Available IDs: [...]"
+
+STEP 3: Check Selection Creation
+-------------------------------
+Verify that 'focus_time_selection' was properly created:
+
+\`\`\`javascript
+import { setFamilyActivitySelectionId } from 'react-native-device-activity';
+
+// Did you create the selection like this?
+setFamilyActivitySelectionId({
+  id: 'focus_time_selection',
+  familyActivitySelection: validSelectionString // ← Must be non-empty base64 string
+});
+\`\`\`
+
+STEP 4: Most Likely Causes
+--------------------------
+Based on your logs, the selection "focus_time_selection":
+
+1. 📋 Never created → Use DeviceActivitySelectionView to create it
+2. 🗑️ Was cleared/deleted → Selection was removed or overwritten with empty
+3. 📱 App data reset → UserDefaults cleared or app reinstalled
+4. 🔧 Wrong storage key → Using wrong ID or storage mechanism mismatch
+
+STEP 5: Quick Fix - Create Valid Selection
+-----------------------------------------
+If you need to create the selection quickly:
+
+\`\`\`javascript
+import { DeviceActivitySelectionViewPersisted } from 'react-native-device-activity';
+
+// Show picker to create selection
+<DeviceActivitySelectionViewPersisted
+  familyActivitySelectionId="focus_time_selection"
+  onSelectionChange={(event) => {
+    console.log('Selection created:', event.nativeEvent);
+    // This will automatically store it with the ID
+  }}
+/>
+\`\`\`
+
+🚨 NEXT STEPS:
+==============
+1. ✅ Test that infinite loop is fixed (renderCount should stabilize)
+2. 🔍 Add storage debugging code above
+3. 📱 Check Xcode console for Swift logs
+4. 🛠️ Create or recreate the "focus_time_selection" if missing
+
+📊 Expected Log Pattern After Fix:
+=================================
+✅ "📊 DeviceActivityReportView Render Debug: {..., hasFamilyActivitySelection: true, familyActivitySelectionLength: [>0]}"
+✅ "✅ DeviceActivityReportView: Successfully loaded selection for ID: focus_time_selection"
+❌ No more "Maximum update depth exceeded" warnings
+
 To debug blank view issues, watch for these key log patterns:
 
 📊 React Component Logs (Console):
@@ -127,6 +224,37 @@ Look for these patterns that indicate a blank view:
 4. Look for differences in the log patterns
 
 Good luck debugging! 🐛🔍
+
+📚 STORAGE DEBUGGING HELPER:
+===========================
+Add this function to debug storage issues:
+
+function debugFamilyActivityStorage() {
+  const { getFamilyActivitySelectionId, userDefaultsGet } = require('react-native-device-activity');
+  
+  console.log('🔍 Storage Debug Report:');
+  console.log('========================');
+  
+  // Check specific selection
+  const focusSelection = getFamilyActivitySelectionId('focus_time_selection');
+  console.log('📦 focus_time_selection:', {
+    exists: !!focusSelection,
+    length: focusSelection?.length || 0,
+    preview: focusSelection?.substring(0, 50) + '...' || 'null'
+  });
+  
+  // Check all stored selections
+  const allSelections = userDefaultsGet('familyActivitySelectionIds') || {};
+  console.log('📚 All stored selections:', Object.keys(allSelections));
+  
+  // Check each selection
+  Object.entries(allSelections).forEach(([id, data]) => {
+    console.log(\`📋 \${id}: \${data?.length || 0} chars\`);
+  });
+}
+
+// Call this in your component
+debugFamilyActivityStorage();
 `);
 
 // Helper functions for log analysis
@@ -151,6 +279,13 @@ const logPatterns = {
     'Found app',
     'Data list view appeared',
     'Returning [N] app usage entries'
+  ],
+  
+  // NEW: Infinite loop indicators
+  infiniteLoopIndicators: [
+    'Maximum update depth exceeded',
+    'renderCount.*7[0-9][0-9]', // renderCount > 700
+    'timestamp.*same millisecond.*multiple times'
   ]
 };
 
@@ -163,8 +298,14 @@ function analyzeLogLine(line) {
     line.includes(pattern)
   );
   
-  if (isBlankIndicator) {
-    return { type: 'warning', message: line };
+  const isInfiniteLoop = logPatterns.infiniteLoopIndicators.some(pattern => 
+    new RegExp(pattern).test(line)
+  );
+  
+  if (isInfiniteLoop) {
+    return { type: 'critical', message: line, issue: 'infinite_loop' };
+  } else if (isBlankIndicator) {
+    return { type: 'warning', message: line, issue: 'blank_view' };
   } else if (isSuccessIndicator) {
     return { type: 'success', message: line };
   }
@@ -172,10 +313,42 @@ function analyzeLogLine(line) {
   return { type: 'info', message: line };
 }
 
-console.log('\n📖 Example log analysis function available:');
-console.log('Run analyzeLogLine("your log message here") to classify log importance\n');
+// NEW: Specific function for your current issue
+function analyzeYourLogs() {
+  console.log(`
+🔍 ANALYSIS OF YOUR SPECIFIC LOGS:
+=================================
+
+❌ CRITICAL ISSUES FOUND:
+1. INFINITE RENDER LOOP
+   - renderCount: 716 → 727 in seconds
+   - "Maximum update depth exceeded" 
+   - STATUS: SHOULD BE FIXED NOW
+
+2. EMPTY SELECTION DATA  
+   - familyActivitySelectionId: "focus_time_selection" ✅
+   - hasFamilyActivitySelection: false ❌
+   - familyActivitySelectionLength: 0 ❌
+   - STATUS: NEEDS DEBUGGING
+
+✅ GOOD INDICATORS:
+   - Valid time range: 12.69 hours ✅
+   - Valid selection ID length: 20 chars ✅
+   - No Swift errors visible ✅
+
+🚨 NEXT ACTION REQUIRED:
+   1. Test that infinite loop is fixed
+   2. Debug storage for "focus_time_selection"
+   3. Check Xcode console for Swift logs
+   4. Create selection if missing
+`);
+}
+
+console.log('\n📖 Analysis functions available:');
+console.log('- analyzeLogLine(line) - Classify individual log lines');
+console.log('- analyzeYourLogs() - Analysis of your specific issue');
 
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { logPatterns, analyzeLogLine };
+  module.exports = { logPatterns, analyzeLogLine, analyzeYourLogs };
 } 

@@ -14,14 +14,14 @@ export default function DeviceActivityReportView({
   to,
   ...otherProps
 }: DeviceActivityReportViewProps) {
-  const [renderCount, setRenderCount] = React.useState(0);
+  // Use ref to track render count without causing re-renders
+  const renderCountRef = React.useRef(0);
   
-  // Track render count for debugging
-  React.useEffect(() => {
-    setRenderCount(prev => prev + 1);
-  });
-
-  // Enhanced debugging for blank view issues
+  // Increment render count on every render (but don't trigger re-renders)
+  renderCountRef.current += 1;
+  const renderCount = renderCountRef.current;
+  
+  // Enhanced debugging for blank view issues - Now safe to include renderCount
   React.useEffect(() => {
     const debugInfo = {
       renderCount,
@@ -59,7 +59,7 @@ export default function DeviceActivityReportView({
       }
     }
     
-  }, [familyActivitySelection, familyActivitySelectionId, context, from, to, renderCount, otherProps]);
+  }, [familyActivitySelection, familyActivitySelectionId, context, from, to, otherProps]); // Safe: renderCount not in dependencies
 
   // Log component lifecycle
   React.useEffect(() => {
