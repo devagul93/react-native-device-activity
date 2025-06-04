@@ -55,34 +55,34 @@ func convertToPropertyListCompatible(_ dict: [String: Any]) -> [String: Any] {
 class DeviceActivityReportViewModelBase: ObservableObject {
   @Published var familyActivitySelection = FamilyActivitySelection() {
     didSet {
-      reportLogger.log("📊 Model: familyActivitySelection changed - Apps: \(familyActivitySelection.applicationTokens.count), Categories: \(familyActivitySelection.categoryTokens.count), Domains: \(familyActivitySelection.webDomainTokens.count)")
+      reportLogger.log("📊 Model: familyActivitySelection changed - Apps: \(self.familyActivitySelection.applicationTokens.count), Categories: \(self.familyActivitySelection.categoryTokens.count), Domains: \(self.familyActivitySelection.webDomainTokens.count)")
     }
   }
   @Published var context = "Total Activity" {
     didSet {
-      reportLogger.log("📊 Model: context changed to '\(context)'")
+      reportLogger.log("📊 Model: context changed to '\(self.context)'")
     }
   }
   @Published var from = Date.distantPast {
     didSet {
-      reportLogger.log("📊 Model: from date changed to \(from)")
+      reportLogger.log("📊 Model: from date changed to \(self.from)")
       logTimeRangeValidation()
     }
   }
   @Published var to = Date.distantPast {
     didSet {
-      reportLogger.log("📊 Model: to date changed to \(to)")
+      reportLogger.log("📊 Model: to date changed to \(self.to)")
       logTimeRangeValidation()
     }
   }
   @Published var segmentation: String = "daily" {
     didSet {
-      reportLogger.log("📊 Model: segmentation changed to '\(segmentation)'")
+      reportLogger.log("📊 Model: segmentation changed to '\(self.segmentation)'")
     }
   }
   @Published var reportStyle: [String: Any]? {
     didSet {
-      reportLogger.log("📊 Model: reportStyle changed - \(reportStyle?.description ?? "nil")")
+      reportLogger.log("📊 Model: reportStyle changed - \(self.reportStyle?.description ?? "nil")")
     }
   }
 
@@ -113,12 +113,12 @@ class DeviceActivityReportViewModelBase: ObservableObject {
 class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   @Published var devices = DeviceActivityFilter.Devices(Set<DeviceActivityData.Device.Model>()) {
     didSet {
-      reportLogger.log("📊 Model: devices changed - \(devices)")
+      reportLogger.log("📊 Model: devices changed - \(self.devices)")
     }
   }
   @Published var users: DeviceActivityFilter.Users? = .all {
     didSet {
-      reportLogger.log("📊 Model: users changed to \(users?.debugDescription ?? "nil")")
+      reportLogger.log("📊 Model: users changed to \(self.users?.debugDescription ?? "nil")")
     }
   }
 

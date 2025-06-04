@@ -950,17 +950,16 @@ public class DeviceActivityReportViewModule: Module {
         view.model.to = toDate
         
         // Log time range validation
-        if let fromDate = view.model.from {
-          let timeInterval = toDate.timeIntervalSince(fromDate)
-          let hours = timeInterval / 3600
-          let days = timeInterval / (3600 * 24)
-          logger.log("📅 DeviceActivityReportView: Time range set - Duration: \(hours) hours (\(days) days)")
-          
-          if timeInterval <= 0 {
-            logger.log("⚠️ DeviceActivityReportView: Invalid time range - 'to' is not after 'from'")
-          } else if timeInterval < 3600 {
-            logger.log("⚠️ DeviceActivityReportView: Very short time range (< 1 hour) - may have insufficient data")
-          }
+        let fromDate = view.model.from
+        let timeInterval = toDate.timeIntervalSince(fromDate)
+        let hours = timeInterval / 3600
+        let days = timeInterval / (3600 * 24)
+        logger.log("📅 DeviceActivityReportView: Time range set - Duration: \(hours) hours (\(days) days)")
+        
+        if timeInterval <= 0 {
+          logger.log("⚠️ DeviceActivityReportView: Invalid time range - 'to' is not after 'from'")
+        } else if timeInterval < 3600 {
+          logger.log("⚠️ DeviceActivityReportView: Very short time range (< 1 hour) - may have insufficient data")
         }
         
         logger.log("✅ DeviceActivityReportView: to prop set successfully")
