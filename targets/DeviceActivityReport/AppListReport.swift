@@ -79,7 +79,7 @@ struct AppListReport: DeviceActivityReportScene {
                   }
                 } catch {
                   processingErrors += 1
-                  appListLogger.log("❌ AppListReport: Error processing applications in category \(totalCategories): \(error)")
+                  appListLogger.log("❌ AppListReport: Error processing applications in category \(totalCategories): \(String(describing: error))")
                 }
 
                 // Also check for web domains if any
@@ -96,22 +96,22 @@ struct AppListReport: DeviceActivityReportScene {
                   }
                 } catch {
                   processingErrors += 1
-                  appListLogger.log("❌ AppListReport: Error processing web domains in category \(totalCategories): \(error)")
+                  appListLogger.log("❌ AppListReport: Error processing web domains in category \(totalCategories): \(String(describing: error))")
                 }
               }
             } catch {
               processingErrors += 1
-              appListLogger.log("❌ AppListReport: Error processing categories in segment \(totalActivitySegments): \(error)")
+              appListLogger.log("❌ AppListReport: Error processing categories in segment \(totalActivitySegments): \(String(describing: error))")
             }
           }
         } catch {
           processingErrors += 1
-          appListLogger.log("❌ AppListReport: Error processing activity segments in data point \(totalDataPoints): \(error)")
+          appListLogger.log("❌ AppListReport: Error processing activity segments in data point \(totalDataPoints): \(String(describing: error))")
         }
       }
     } catch {
       processingErrors += 1
-      appListLogger.log("❌ AppListReport: Error iterating through data points: \(error)")
+      appListLogger.log("❌ AppListReport: Error iterating through data points: \(String(describing: error))")
     }
 
     let processingTime = Date().timeIntervalSince(startTime)

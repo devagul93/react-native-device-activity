@@ -126,7 +126,7 @@ class DeviceActivityReportViewModel: DeviceActivityReportViewModelBase {
   var segment: DeviceActivityFilter.SegmentInterval {
     let interval = DateInterval(start: from, end: to)
     
-    reportLogger.log("🔄 Model: Computing segment for interval \(interval) with segmentation '\(self.segmentation)'")
+    reportLogger.log("🔄 Model: Computing segment for interval from \(self.from) to \(self.to) with segmentation '\(self.segmentation)'")
 
     if self.segmentation == "hourly" {
       reportLogger.log("✅ Model: Using hourly segmentation")
@@ -270,7 +270,7 @@ struct DeviceActivityReportUI: View {
     reportLogger.log("   Apps: \(model.familyActivitySelection.applicationTokens.count)")
     reportLogger.log("   Categories: \(model.familyActivitySelection.categoryTokens.count)")
     reportLogger.log("   Domains: \(model.familyActivitySelection.webDomainTokens.count)")
-    reportLogger.log("   Time Range: \(model.from) to \(model.to)")
+    reportLogger.log("   Time Range: \(model.from.description) to \(model.to.description)")
     reportLogger.log("   Duration Hours: \(timeInterval / 3600)")
     reportLogger.log("   Segmentation: '\(model.segmentation)'")
     
@@ -329,6 +329,6 @@ class DeviceActivityReportView: ExpoView {
   override func layoutSubviews() {
     super.layoutSubviews()
     contentView.view.frame = bounds
-    reportLogger.log("📐 DeviceActivityReportView: Layout updated - bounds: \(NSStringFromCGRect(bounds))")
+    reportLogger.log("📐 DeviceActivityReportView: Layout updated - bounds: \(String(describing: self.bounds))")
   }
 }
