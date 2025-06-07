@@ -21,6 +21,11 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
       AppListView(appUsageData: appUsageData)
     }
 
+    // Add the most used apps report
+    MostUsedAppsReport { mostUsedAppsData in
+      MostUsedAppsView(mostUsedAppsData: mostUsedAppsData)
+    }
+
     // Add the pickups report (iOS 16.0+)
     // Note: Since PickupsReport is already marked with @available(iOS 16.0, *),
     // we can include it directly here. The availability check is handled at the type level.
