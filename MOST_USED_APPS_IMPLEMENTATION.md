@@ -1,16 +1,17 @@
 # Most Used Apps Implementation Guide
 
-This guide explains how to implement a "Most Used Apps" feature similar to Apple's Screen Time interface using the DeviceActivityReport framework.
+This guide explains how to implement a "Most Used Apps" feature that exactly matches Apple's Screen Time interface using the DeviceActivityReport framework.
 
 ## Overview
 
-The "Most Used Apps" feature displays the top applications based on usage time, complete with:
-- App icons and names
-- Usage duration 
-- Category information
-- Total usage time
-- Clean, Apple-style interface
-- Smart usage insights
+The enhanced "Most Used Apps" feature displays usage data with pixel-perfect accuracy to Apple's design:
+- Large centered total time display (e.g., "115mins")
+- Horizontal layout with 3 main app icons
+- Brand-accurate app colors (Instagram pink, X black, Reddit orange)
+- Intelligent behavioral insights and peak usage detection
+- Smart blocking recommendations based on usage patterns
+- Dark gradient background matching iOS design
+- Social media usage pattern analysis
 
 ## Architecture
 

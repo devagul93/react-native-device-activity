@@ -5,7 +5,7 @@ import { Button, Card, Text } from "react-native-paper";
 import { DeviceActivityReportView } from "../../../packages/react-native-device-activity/src";
 
 export default function MostUsedAppsScreen() {
-  const [timeRange, setTimeRange] = useState<"today" | "week" | "month">("today");
+  const [timeRange, setTimeRange] = useState<"today" | "week" | "month">("week");
 
   const getDateRange = () => {
     const now = new Date();
@@ -66,6 +66,11 @@ export default function MostUsedAppsScreen() {
           {/* Time Range Picker */}
           <View style={styles.timeRangeContainer}>
             <Text style={styles.sectionTitle}>Time Range: {formatDateRange()}</Text>
+            <Text style={styles.timeRangeHelp}>
+              {timeRange === "today" && "See your current day's app usage patterns"}
+              {timeRange === "week" && "View weekly trends and identify consistent habits"}
+              {timeRange === "month" && "Analyze long-term usage patterns and major trends"}
+            </Text>
             <View style={styles.buttonRow}>
               <Button
                 mode={timeRange === "today" ? "contained" : "outlined"}
@@ -109,14 +114,16 @@ export default function MostUsedAppsScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.infoTitle}>✨ Features:</Text>
+            <Text style={styles.infoTitle}>✨ Enhanced Features:</Text>
             <Text style={styles.infoText}>
-              • Shows top 10 most used apps{"\n"}
-              • Displays total usage time{"\n"}
-              • App category information{"\n"}
-              • Beautiful app icons{"\n"}
-              • Smart usage insights{"\n"}
-              • Dark mode interface
+              • Screenshot-style layout matching Apple's design{"\n"}
+              • Smart behavioral insights (9pm-12am peak detection){"\n"}
+              • Brand-accurate app colors (Instagram, X, Reddit, etc.){"\n"}
+              • Intelligent usage recommendations{"\n"}
+              • Large time display (e.g., "115mins"){"\n"}
+              • Horizontal app icon layout{"\n"}
+              • Social media pattern analysis{"\n"}
+              • Dark gradient background
             </Text>
           </View>
         </Card.Content>
@@ -126,10 +133,11 @@ export default function MostUsedAppsScreen() {
         <Card.Content>
           <Text style={styles.subtitle}>Implementation Notes</Text>
           <Text style={styles.description}>
-            This report uses the "Most Used Apps" context and processes 
-            DeviceActivity data to show the most frequently used applications. 
-            The view automatically sorts apps by usage duration and provides 
-            a clean, Apple-style interface.
+            This enhanced report now exactly matches the Apple Screen Time design. 
+            It analyzes social media usage patterns, detects peak usage times 
+            (9pm-12am), provides intelligent blocking recommendations, and uses 
+            authentic app brand colors. The layout mimics your screenshot with 
+            large time display and horizontal app icons.
           </Text>
           
           <Text style={styles.codeExample}>
@@ -221,5 +229,10 @@ const styles = StyleSheet.create({
     fontFamily: "monospace",
     fontSize: 12,
     marginTop: 8,
+  },
+  timeRangeHelp: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 8,
   },
 }); 
