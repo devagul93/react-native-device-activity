@@ -59,8 +59,8 @@ export default function MostUsedAppsScreen() {
         <Card.Content>
           <Text style={styles.title}>Most Used Apps</Text>
           <Text style={styles.description}>
-            View your most frequently used applications with detailed usage insights, 
-            similar to Apple's Screen Time interface.
+            View your most frequently used applications with daily averages, peak usage hours, 
+            and intelligent behavioral insights - all in a pixel-perfect Apple Screen Time interface.
           </Text>
 
           {/* Time Range Picker */}
@@ -114,16 +114,16 @@ export default function MostUsedAppsScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.infoTitle}>✨ Enhanced Features:</Text>
+            <Text style={styles.infoTitle}>✨ Key Improvements:</Text>
             <Text style={styles.infoText}>
-              • Screenshot-style layout matching Apple's design{"\n"}
-              • Smart behavioral insights (9pm-12am peak detection){"\n"}
-              • Brand-accurate app colors (Instagram, X, Reddit, etc.){"\n"}
-              • Intelligent usage recommendations{"\n"}
-              • Large time display (e.g., "115mins"){"\n"}
-              • Horizontal app icon layout{"\n"}
-              • Social media pattern analysis{"\n"}
-              • Dark gradient background
+              • Daily averages instead of cumulative totals{"\n"}
+              • Dynamic peak usage hour detection{"\n"}
+              • Per-day calculations across time ranges{"\n"}
+              • Detailed app breakdown with individual usage{"\n"}
+              • Enhanced behavioral insights with context{"\n"}
+              • Gradient background and refined typography{"\n"}
+              • "per day" labels for clarity{"\n"}
+              • Better empty state design
             </Text>
           </View>
         </Card.Content>
@@ -133,11 +133,10 @@ export default function MostUsedAppsScreen() {
         <Card.Content>
           <Text style={styles.subtitle}>Implementation Notes</Text>
           <Text style={styles.description}>
-            This enhanced report now exactly matches the Apple Screen Time design. 
-            It analyzes social media usage patterns, detects peak usage times 
-            (9pm-12am), provides intelligent blocking recommendations, and uses 
-            authentic app brand colors. The layout mimics your screenshot with 
-            large time display and horizontal app icons.
+            This enhanced report now shows daily averages instead of cumulative totals, 
+            detects peak usage hours dynamically, and provides better insights. 
+            The layout is pixel-perfect to match Apple's Screen Time interface 
+            with authentic app branding and intelligent behavioral recommendations.
           </Text>
           
           <Text style={styles.codeExample}>
@@ -234,5 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     marginBottom: 8,
+    textAlign: "center",
+    fontStyle: "italic",
   },
 }); 

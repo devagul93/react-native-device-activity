@@ -22,8 +22,8 @@ struct DeviceActivityReportUI: DeviceActivityReportExtension {
     }
 
     // Add the most used apps report
-    MostUsedAppsReport { mostUsedAppsData in
-      MostUsedAppsView(mostUsedAppsData: mostUsedAppsData)
+    MostUsedAppsReport { mostUsedAppsData, insights in
+      MostUsedAppsView(mostUsedAppsData: mostUsedAppsData, insights: insights)
     }
 
     // Add the pickups report (iOS 16.0+)
