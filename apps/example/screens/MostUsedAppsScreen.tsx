@@ -101,16 +101,18 @@ export default function MostUsedAppsScreen() {
 
           {/* Most Used Apps Report */}
           <View style={styles.reportContainer} pointerEvents="box-none">
-            <DeviceActivityReportView
-              style={styles.reportView}
-              context="Most Used Apps"
-              familyActivitySelection={null} // Show all apps
-              from={startDate.getTime()}
-              to={endDate.getTime()}
-              segmentation={timeRange === "today" ? "hourly" : "daily"}
-              users="all"
-              devices={null}
-            />
+            <View pointerEvents="auto">
+              <DeviceActivityReportView
+                style={styles.reportView}
+                context="Most Used Apps"
+                familyActivitySelection={null} // Show all apps
+                from={startDate.getTime()}
+                to={endDate.getTime()}
+                segmentation={timeRange === "today" ? "hourly" : "daily"}
+                users="all"
+                devices={null}
+              />
+            </View>
           </View>
 
           <View style={styles.infoSection}>

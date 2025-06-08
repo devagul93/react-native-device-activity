@@ -345,7 +345,7 @@ struct MostUsedAppsView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     .background(Color.clear)
     .preferredColorScheme(.dark)
-    .allowsHitTesting(false) // Allow parent scroll view to handle touches
+    .clipped() // Allow touch interactions but let scroll gestures pass through
   }
 }
 
