@@ -345,7 +345,9 @@ struct MostUsedAppsView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     .background(Color.clear)
     .preferredColorScheme(.dark)
-    .clipped() // Allow touch interactions but let scroll gestures pass through
+    .clipped()
+    .contentShape(Rectangle()) // Define the content shape for better touch handling
+    .allowsHitTesting(false) // Disable hit testing to allow parent scrolling
   }
 }
 
@@ -377,7 +379,7 @@ struct MostUsedAppsReport: DeviceActivityReportScene {
         for await categoryActivity in activitySegment.categories {
           let categoryName = categoryActivity.category.localizedDisplayName
           
-          // Process applications within each category
+          // Process applications within each category (like App List)
           for await applicationActivity in categoryActivity.applications {
             let appName = applicationActivity.application.localizedDisplayName 
               ?? applicationActivity.application.bundleIdentifier 
@@ -409,7 +411,7 @@ struct MostUsedAppsReport: DeviceActivityReportScene {
             hourlyUsage[hour, default: 0] += duration
           }
 
-          // Also process web domains if any
+          // Also process web domains if any (like App List)
           for await webDomainActivity in categoryActivity.webDomains {
             let domainName = webDomainActivity.webDomain.domain ?? "Unknown Website"
             let duration = webDomainActivity.totalActivityDuration
