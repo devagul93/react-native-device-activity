@@ -114,16 +114,16 @@ export default function MostUsedAppsScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.infoTitle}>✨ Key Improvements:</Text>
+            <Text style={styles.infoTitle}>✨ Enhanced Features:</Text>
             <Text style={styles.infoText}>
-              • Daily averages instead of cumulative totals{"\n"}
+              • Sorted by usage (most used apps first){"\n"}
+              • Daily averages with "per day" labels{"\n"}
               • Dynamic peak usage hour detection{"\n"}
-              • Per-day calculations across time ranges{"\n"}
-              • Detailed app breakdown with individual usage{"\n"}
-              • Enhanced behavioral insights with context{"\n"}
-              • Gradient background and refined typography{"\n"}
-              • "per day" labels for clarity{"\n"}
-              • Better empty state design
+              • Enhanced behavioral insights (larger text){"\n"}
+              • Scrollable interface (touch-through enabled){"\n"}
+              • Optimized 320px height for better layout{"\n"}
+              • Clean header without dots{"\n"}
+              • Refined time display sizing
             </Text>
           </View>
         </Card.Content>
@@ -133,10 +133,10 @@ export default function MostUsedAppsScreen() {
         <Card.Content>
           <Text style={styles.subtitle}>Implementation Notes</Text>
           <Text style={styles.description}>
-            This enhanced report now shows daily averages instead of cumulative totals, 
-            detects peak usage hours dynamically, and provides better insights. 
-            The layout is pixel-perfect to match Apple's Screen Time interface 
-            with authentic app branding and intelligent behavioral recommendations.
+            This optimized report features a cleaner design with improved usability. 
+            Apps are sorted by usage (most used first), the behavioral insight text 
+            is larger and more readable, and the interface allows proper scrolling 
+            with the recommended 320px height for optimal layout.
           </Text>
           
           <Text style={styles.codeExample}>
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   reportView: {
-    height: 400,
+    height: 320, // Optimized height for the enhanced layout
     backgroundColor: "#1a1a1a",
     borderRadius: 12,
     overflow: "hidden",

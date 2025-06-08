@@ -179,32 +179,15 @@ struct MostUsedAppsView: View {
       VStack(alignment: .leading, spacing: 0) {
         // Header with title and time period indicator
         VStack(alignment: .leading, spacing: 10) {
-          HStack {
-            Text("Most Used Apps")
-              .font(.system(size: 17, weight: .semibold))
-              .foregroundColor(.white)
-            
-            Spacer()
-            
-            // Time period indicator dots
-            HStack(spacing: 4) {
-              Circle()
-                .fill(.white.opacity(0.8))
-                .frame(width: 6, height: 6)
-              Circle()
-                .fill(.white.opacity(0.3))
-                .frame(width: 6, height: 6)
-              Circle()
-                .fill(.white.opacity(0.3))
-                .frame(width: 6, height: 6)
-            }
-          }
+          Text("Most Used Apps")
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundColor(.white)
           
           if !mostUsedAppsData.isEmpty {
             Text(insights.behavioralInsight)
-              .font(.system(size: 13, weight: .regular))
-              .foregroundColor(.white.opacity(0.85))
-              .lineLimit(2)
+              .font(.system(size: 15, weight: .regular))
+              .foregroundColor(.white.opacity(0.9))
+              .lineLimit(3)
               .fixedSize(horizontal: false, vertical: true)
           }
         }
@@ -219,7 +202,7 @@ struct MostUsedAppsView: View {
             if !mostUsedAppsData.isEmpty {
               // Daily average time (large display)
               Text(formatDailyAverage(mostUsedAppsData))
-                .font(.system(size: 48, weight: .thin, design: .default))
+                .font(.system(size: 42, weight: .thin, design: .default))
                 .foregroundColor(.white)
                 .tracking(-1)
               
@@ -362,6 +345,7 @@ struct MostUsedAppsView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     .background(Color.clear)
     .preferredColorScheme(.dark)
+    .allowsHitTesting(false) // Allow parent scroll view to handle touches
   }
 }
 
@@ -469,28 +453,11 @@ struct MostUsedAppsReport: DeviceActivityReportScene {
       )
     }
     
-    // Separate social media and other apps, sort by daily average
-    let socialMediaApps = allApps.filter { app in
-      app.categoryName?.lowercased().contains("social") == true ||
-      app.appName.lowercased().contains("instagram") ||
-      app.appName.lowercased().contains("twitter") ||
-      app.appName.lowercased().contains("reddit") ||
-      app.appName.lowercased().contains("facebook") ||
-      app.appName.lowercased().contains("tiktok") ||
-      app.appName.lowercased().contains("snapchat") ||
-      app.appName.lowercased().contains("x")
-    }.sorted { $0.dailyAverage > $1.dailyAverage }
+    // Sort all apps by daily average usage (highest first)
+    let sortedApps = allApps.sorted { $0.dailyAverage > $1.dailyAverage }
     
-    let otherApps = allApps.filter { app in
-      !socialMediaApps.contains { $0.appName == app.appName }
-    }.sorted { $0.dailyAverage > $1.dailyAverage }
-    
-    // Prioritize social media apps first, then add others
-    var finalApps: [MostUsedAppsData] = []
-    finalApps.append(contentsOf: socialMediaApps.prefix(3)) // Top 3 social media
-    finalApps.append(contentsOf: otherApps.prefix(7)) // Up to 7 other apps
-    
-    let topApps = Array(finalApps.prefix(10))
+    // Take the top 10 most used apps regardless of category
+    let topApps = Array(sortedApps.prefix(10))
     
     // Generate usage insights
     let insights = generateInsights(apps: topApps, hourlyUsage: hourlyUsage, daysInPeriod: daysInPeriod)
