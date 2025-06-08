@@ -179,13 +179,13 @@ class DeviceActivityReportView: ExpoView {
     contentView.view.isUserInteractionEnabled = true
     self.isUserInteractionEnabled = true
     
-    // Allow simultaneous gesture recognition for better scrolling behavior
-    if let recognizers = contentView.view.gestureRecognizers {
-      for recognizer in recognizers {
-        recognizer.cancelsTouchesInView = false
-        recognizer.delaysTouchesBegan = false
-        recognizer.delaysTouchesEnded = false
+    // For contexts that need scrolling pass-through, disable user interaction
+    if #available(iOS 16.0, *), let viewModel = model as? DeviceActivityReportViewModel {
+      if viewModel.context == "Most Used Apps" || viewModel.context == "App List" {
+        contentView.view.isUserInteractionEnabled = false
       }
+    } else if model.context == "Most Used Apps" || model.context == "App List" {
+      contentView.view.isUserInteractionEnabled = false
     }
     
     self.addSubview(contentView.view)
@@ -197,6 +197,12 @@ class DeviceActivityReportView: ExpoView {
   
   // Override to allow touch events to pass through when not handled by the content
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    // For contexts like "Most Used Apps" and "App List", always pass touches through
+    // to enable parent ScrollView scrolling
+    if model.context == "Most Used Apps" || model.context == "App List" {
+      return nil
+    }
+    
     let hitView = super.hitTest(point, with: event)
     
     // If the hit view is this view itself (not a subview), return nil to pass touch through
@@ -204,47 +210,27 @@ class DeviceActivityReportView: ExpoView {
       return nil
     }
     
-    // For DeviceActivityReport content, we want to allow scrolling in the parent
-    // while still maintaining some interactivity for specific elements
+    // For other DeviceActivityReport content, be more selective
     if let hitView = hitView {
       // Check if we hit the SwiftUI hosting view or its content
       if hitView == contentView.view || hitView.isDescendant(of: contentView.view) {
-        // For most contexts like "Most Used Apps", we want to pass touches through
-        // to enable parent scrolling, unless it's an interactive element
-        if shouldPassTouchThrough(for: hitView, at: point) {
-          return nil
+        // Check if it's an interactive element
+        let viewDescription = String(describing: type(of: hitView))
+        
+        // Don't pass through touches for clearly interactive elements
+        if viewDescription.contains("Button") || 
+           viewDescription.contains("TextField") ||
+           viewDescription.contains("Toggle") ||
+           viewDescription.contains("Stepper") ||
+           viewDescription.contains("Slider") {
+          return hitView
         }
+        
+        // For non-interactive content, pass through to enable parent scrolling
+        return nil
       }
     }
     
     return hitView
-  }
-  
-  // Helper method to determine if touches should pass through for better scrolling
-  private func shouldPassTouchThrough(for view: UIView, at point: CGPoint) -> Bool {
-    // For most DeviceActivityReport contexts, especially "Most Used Apps",
-    // we want to pass touches through to enable parent ScrollView scrolling
-    
-    // Check if we're dealing with specific interactive elements that should capture touches
-    let viewDescription = String(describing: type(of: view))
-    
-    // Don't pass through touches for clearly interactive elements
-    if viewDescription.contains("Button") || 
-       viewDescription.contains("TextField") ||
-       viewDescription.contains("Toggle") ||
-       viewDescription.contains("Stepper") ||
-       viewDescription.contains("Slider") {
-      return false
-    }
-    
-    // For contexts like "Most Used Apps", we especially want to enable parent scrolling
-    if model.context == "Most Used Apps" || model.context == "App List" {
-      return true
-    }
-    
-    // For SwiftUI content in DeviceActivityReport,
-    // generally pass touches through to enable parent scrolling
-    // This allows the React Native ScrollView to handle scrolling gestures
-    return true
   }
 }
