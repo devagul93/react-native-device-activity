@@ -381,11 +381,11 @@ struct MostUsedAppsReport: DeviceActivityReportScene {
     
     // Process all activity data to extract app usage and time patterns
     for await dataPoint in data {
-      // Track unique days for calculating averages
-      let dayKey = Calendar.current.dateInterval(of: .day, for: dataPoint.dateInterval.start)?.start.timeIntervalSince1970 ?? 0
-      totalDays.insert(String(dayKey))
-      
       for await activitySegment in dataPoint.activitySegments {
+        // Track unique days for calculating averages
+        let dayKey = Calendar.current.dateInterval(of: .day, for: activitySegment.dateInterval.start)?.start.timeIntervalSince1970 ?? 0
+        totalDays.insert(String(dayKey))
+        
         // Extract hour for peak usage analysis
         let hour = Calendar.current.component(.hour, from: activitySegment.dateInterval.start)
         
