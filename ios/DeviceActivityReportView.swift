@@ -174,10 +174,27 @@ class DeviceActivityReportView: ExpoView {
     contentView.view.backgroundColor = .clear
     contentView.view.isOpaque = false
     contentView.overrideUserInterfaceStyle = .dark
+    
+    // Enable touch pass-through for scrolling
+    contentView.view.isUserInteractionEnabled = true
+    self.isUserInteractionEnabled = true
+    
     self.addSubview(contentView.view)
   }
 
   override func layoutSubviews() {
     contentView.view.frame = bounds
+  }
+  
+  // Override to allow touch events to pass through when not handled by the content
+  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    let hitView = super.hitTest(point, with: event)
+    
+    // If the hit view is this view itself (not a subview), return nil to pass touch through
+    if hitView == self {
+      return nil
+    }
+    
+    return hitView
   }
 }

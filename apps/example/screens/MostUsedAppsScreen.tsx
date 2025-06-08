@@ -100,7 +100,7 @@ export default function MostUsedAppsScreen() {
           </View>
 
           {/* Most Used Apps Report */}
-          <View style={styles.reportContainer}>
+          <View style={styles.reportContainer} pointerEvents="box-none">
             <DeviceActivityReportView
               style={styles.reportView}
               context="Most Used Apps"
