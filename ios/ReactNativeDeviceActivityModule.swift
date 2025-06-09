@@ -133,8 +133,7 @@ struct DeviceActivityEventFromJS: ExpoModulesCore.Record {
   var includesPastActivity: Bool?
 }
 
-func convertToSwiftDateComponents(from dateComponentsFromJS: DateComponentsFromJS) -> DateComponents
-{
+func convertToSwiftDateComponents(from dateComponentsFromJS: DateComponentsFromJS) -> DateComponents {
   var swiftDateComponents = DateComponents()
 
   if let era = dateComponentsFromJS.era {
@@ -916,6 +915,8 @@ public class DeviceActivityReportViewModule: Module {
 
       Prop("context") { (view: DeviceActivityReportView, prop: String) in
         view.model.context = prop
+        // Configure touch handling based on context
+        view.configureForScrollPassThrough()
       }
 
       Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in

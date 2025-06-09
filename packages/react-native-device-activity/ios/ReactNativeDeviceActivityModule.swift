@@ -915,6 +915,8 @@ public class DeviceActivityReportViewModule: Module {
 
       Prop("context") { (view: DeviceActivityReportView, prop: String) in
         view.model.context = prop
+        // Configure touch handling based on context
+        view.configureForScrollPassThrough()
       }
 
       Prop("segmentation") { (view: DeviceActivityReportView, prop: String) in

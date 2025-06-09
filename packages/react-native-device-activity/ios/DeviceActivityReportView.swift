@@ -146,19 +146,6 @@ struct DeviceActivityReportUI: View {
   }
 }
 
-// Custom container view that passes touches through for scrolling contexts
-@available(iOS 15.0, *)
-class PassThroughView: UIView {
-  var shouldPassThrough: Bool = false
-  
-  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    if shouldPassThrough {
-      return nil
-    }
-    return super.hitTest(point, with: event)
-  }
-}
-
 // This view will be used as a native component. Make sure to inherit from `ExpoView`
 // to apply the proper styling (e.g. border radius and shadows).
 @available(iOS 15.0, *)
@@ -166,11 +153,8 @@ class DeviceActivityReportView: ExpoView {
 
   public let model: DeviceActivityReportViewModelBase
   private var contentView: UIHostingController<AnyView>
-  private var containerView: PassThroughView
 
-    required init(appContext: AppContext? = nil) {
-    containerView = PassThroughView()
-    
+  required init(appContext: AppContext? = nil) {
     if #available(iOS 16.0, *) {
       let viewModel = DeviceActivityReportViewModel()
       model = viewModel
@@ -186,43 +170,64 @@ class DeviceActivityReportView: ExpoView {
 
     super.init(appContext: appContext)
 
+    setupInitialView()
+  }
+
+  private func setupInitialView() {
     clipsToBounds = true
     contentView.view.backgroundColor = .clear
     contentView.view.isOpaque = false
     contentView.overrideUserInterfaceStyle = .dark
     
-    // Configure the container view for touch pass-through
-    containerView.backgroundColor = .clear
-    containerView.isOpaque = false
+    self.addSubview(contentView.view)
+  }
+  
+  internal func configureForScrollPassThrough() {
+    // Check if this context needs scroll pass-through
+    let needsScrollPassThrough = model.context == "Most Used Apps" || model.context == "App List"
     
-    // For contexts that need scrolling, enable pass-through
-    if model.context == "Most Used Apps" || model.context == "App List" {
-      containerView.shouldPassThrough = true
+    if needsScrollPassThrough {
+      // Completely disable interaction on the entire view hierarchy
+      self.isUserInteractionEnabled = false
       contentView.view.isUserInteractionEnabled = false
+      
+      // Remove any gesture recognizers that might interfere with parent scrolling
+      contentView.view.gestureRecognizers?.removeAll()
+      self.gestureRecognizers?.removeAll()
+      
+      // Make views transparent to touches
+      self.backgroundColor = .clear
+      contentView.view.backgroundColor = .clear
+      
+      print("🔄 DeviceActivityReportView: Configured for scroll pass-through (context: \(model.context))")
     } else {
-      containerView.shouldPassThrough = false
+      self.isUserInteractionEnabled = true
       contentView.view.isUserInteractionEnabled = true
+      
+      print("🔄 DeviceActivityReportView: Configured for normal interaction (context: \(model.context))")
     }
-    
-    // Set up the view hierarchy
-    containerView.addSubview(contentView.view)
-    self.addSubview(containerView)
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    containerView.frame = bounds
-    contentView.view.frame = containerView.bounds
+    contentView.view.frame = bounds
   }
-
-    // Override to allow touch events to pass through when not handled by the content
+  
+  // For scroll contexts, be completely transparent to touches
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    // For contexts that need parent scrolling, completely pass through all touches
-    if model.context == "Most Used Apps" || model.context == "App List" {
-      return nil
+    // Check if this view should be transparent to touches
+    if !self.isUserInteractionEnabled {
+      return nil // Completely transparent to touches
     }
-    
-    // For other contexts, use the container view logic
     return super.hitTest(point, with: event)
+  }
+  
+  // Ensure we don't interfere with React Native's touch handling
+  override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+    // If user interaction is disabled, this view doesn't contain any points
+    if !self.isUserInteractionEnabled {
+      return false // Tell the system this view doesn't contain the point
+    }
+    return super.point(inside: point, with: event)
   }
 }

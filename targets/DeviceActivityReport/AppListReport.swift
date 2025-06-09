@@ -25,8 +25,7 @@ struct AppListReport: DeviceActivityReportScene {
   let content: ([AppUsageData]) -> AppListView
 
   func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async
-    -> [AppUsageData]
-  {
+    -> [AppUsageData] {
     // Extract app names and their usage times from the data
     // The data is filtered by the DeviceActivityFilter based on
     // familyActivitySelection tokens passed to DeviceActivityReportView
