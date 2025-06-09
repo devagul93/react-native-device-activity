@@ -347,8 +347,6 @@ struct MostUsedAppsView: View {
     .background(Color.clear)
     .preferredColorScheme(.dark)
     .clipped()
-    .contentShape(Rectangle())  // Define the content shape for better touch handling
-    .allowsHitTesting(false)  // Disable hit testing to allow parent scrolling
   }
 }
 

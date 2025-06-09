@@ -132,8 +132,8 @@ struct DeviceActivityReportUI: View {
             // you can decide which kind of data to show - apps, categories, and/or web domains
         )
     )
-    .preferredColorScheme(.dark) // Force dark mode
-    .background(Color.clear) // Make background transparent
+    .preferredColorScheme(.dark)  // Force dark mode
+    .background(Color.clear)  // Make background transparent
     .onAppear {
       // Store reportStyle in UserDefaults so the extension can access it
       if let reportStyle = model.reportStyle {
@@ -146,6 +146,19 @@ struct DeviceActivityReportUI: View {
   }
 }
 
+// Custom container view that passes touches through for scrolling contexts
+@available(iOS 15.0, *)
+class PassThroughView: UIView {
+  var shouldPassThrough: Bool = false
+  
+  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    if shouldPassThrough {
+      return nil
+    }
+    return super.hitTest(point, with: event)
+  }
+}
+
 // This view will be used as a native component. Make sure to inherit from `ExpoView`
 // to apply the proper styling (e.g. border radius and shadows).
 @available(iOS 15.0, *)
@@ -153,8 +166,11 @@ class DeviceActivityReportView: ExpoView {
 
   public let model: DeviceActivityReportViewModelBase
   private var contentView: UIHostingController<AnyView>
+  private var containerView: PassThroughView
 
-  required init(appContext: AppContext? = nil) {
+    required init(appContext: AppContext? = nil) {
+    containerView = PassThroughView()
+    
     if #available(iOS 16.0, *) {
       let viewModel = DeviceActivityReportViewModel()
       model = viewModel
@@ -175,62 +191,38 @@ class DeviceActivityReportView: ExpoView {
     contentView.view.isOpaque = false
     contentView.overrideUserInterfaceStyle = .dark
     
-    // Configure for better touch pass-through and parent scrolling
-    contentView.view.isUserInteractionEnabled = true
-    self.isUserInteractionEnabled = true
+    // Configure the container view for touch pass-through
+    containerView.backgroundColor = .clear
+    containerView.isOpaque = false
     
-    // For contexts that need scrolling pass-through, disable user interaction
-    if #available(iOS 16.0, *), let viewModel = model as? DeviceActivityReportViewModel {
-      if viewModel.context == "Most Used Apps" || viewModel.context == "App List" {
-        contentView.view.isUserInteractionEnabled = false
-      }
-    } else if model.context == "Most Used Apps" || model.context == "App List" {
+    // For contexts that need scrolling, enable pass-through
+    if model.context == "Most Used Apps" || model.context == "App List" {
+      containerView.shouldPassThrough = true
       contentView.view.isUserInteractionEnabled = false
+    } else {
+      containerView.shouldPassThrough = false
+      contentView.view.isUserInteractionEnabled = true
     }
     
-    self.addSubview(contentView.view)
+    // Set up the view hierarchy
+    containerView.addSubview(contentView.view)
+    self.addSubview(containerView)
   }
 
   override func layoutSubviews() {
-    contentView.view.frame = bounds
+    super.layoutSubviews()
+    containerView.frame = bounds
+    contentView.view.frame = containerView.bounds
   }
-  
-  // Override to allow touch events to pass through when not handled by the content
+
+    // Override to allow touch events to pass through when not handled by the content
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    // For contexts like "Most Used Apps" and "App List", always pass touches through
-    // to enable parent ScrollView scrolling
+    // For contexts that need parent scrolling, completely pass through all touches
     if model.context == "Most Used Apps" || model.context == "App List" {
       return nil
     }
     
-    let hitView = super.hitTest(point, with: event)
-    
-    // If the hit view is this view itself (not a subview), return nil to pass touch through
-    if hitView == self {
-      return nil
-    }
-    
-    // For other DeviceActivityReport content, be more selective
-    if let hitView = hitView {
-      // Check if we hit the SwiftUI hosting view or its content
-      if hitView == contentView.view || hitView.isDescendant(of: contentView.view) {
-        // Check if it's an interactive element
-        let viewDescription = String(describing: type(of: hitView))
-        
-        // Don't pass through touches for clearly interactive elements
-        if viewDescription.contains("Button") || 
-           viewDescription.contains("TextField") ||
-           viewDescription.contains("Toggle") ||
-           viewDescription.contains("Stepper") ||
-           viewDescription.contains("Slider") {
-          return hitView
-        }
-        
-        // For non-interactive content, pass through to enable parent scrolling
-        return nil
-      }
-    }
-    
-    return hitView
+    // For other contexts, use the container view logic
+    return super.hitTest(point, with: event)
   }
 }
